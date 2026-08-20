@@ -247,7 +247,7 @@
      789P38 standard, so the passing stretch is visible before anything is moved.
      --zonebg is set per slider in JS; custom properties reach the pseudo-element. */
   input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; margin: 0;
-                        height: 20px; cursor: pointer; background: transparent; }
+                        height: 20px; cursor: pointer; background: transparent; --tw: 19px; }
   input[type="range"]::-webkit-slider-runnable-track {
     height: 9px; border-radius: 5px; background: var(--zonebg, var(--track)); }
   input[type="range"]::-webkit-slider-thumb {
@@ -397,34 +397,37 @@
   .cta a.line { border-left-color: var(--lineg); }
   .cta a.line b { color: var(--lineg); }
 
-  /* ===== phone: pin the hole, scroll the sliders under it =====
-     There is no room for two columns on a phone, so instead the drawing is
-     lifted above the sliders and stuck to the top of the screen. Dragging a
-     slider then happens underneath a drawing that stays in view. */
+  /* One card holds the hole and, immediately under it, the sliders that drive
+     it. The border lives on the wrapper so the two read as a single panel. */
+  .panel { border: 1px solid var(--line); background: var(--sheet); }
+  .mapttl { margin: 10px 0 5px; }
+  .plate { border: 0; margin: 0; background: var(--sheet); }
+  .inputbar { border: 0; margin: 0; border-top: 1px solid var(--line); background: transparent; }
+
+  /* on a phone the drawing pins to the top so it stays in view while the
+     sliders below it scroll past */
   @media (max-width: 859px) {
-    .topgrid { display: flex; flex-direction: column; }
-    .mapcol { display: contents; }
-    .mapttl { order: -2; margin: 10px 0 5px; }
-    .plate { order: -1; position: sticky; top: 0; z-index: 25; margin-top: 0;
+    .plate { position: sticky; top: 0; z-index: 25;
              box-shadow: 0 10px 16px -12px rgba(0, 0, 0, .5); }
-    .inputbar { order: 1; margin-top: 14px; }
-    .mapsub { order: 2; }
   }
 
-  /* ===== sliders beside the hole =====
-     Stacked, the window has to be tall enough for the bar AND the drawing.
-     Side by side it only has to fit the taller column, so the drawing stays in
-     view while a slider is dragged whatever the window height. The drawing is
-     allowed to shrink below its 660px minimum here rather than scroll away. */
+  /* ===== each slider under the stage it controls =====
+     The drawing spans the full width with a 0-960 viewBox, so a stage at
+     viewBox x sits at x/960 of the width. Column boundaries are placed between
+     the stages (tee 204, iron 443, approach 713, putt 878) so every slider
+     lands in its own stretch of the hole above it. The drawing must NOT be
+     height-capped here, or it would shrink and break that alignment. */
   @media (min-width: 860px) {
-    .topgrid { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 24px; align-items: start; }
-    .topgrid .inputbar { margin-top: 0; position: static; box-shadow: none; }
-    .topgrid .fields { grid-template-columns: 1fr; column-gap: 0; }
-    .topgrid .fieldpair { grid-column: auto; }
-    .topgrid .mapttl { margin-top: 0; }
-    .topgrid .plate { margin-top: 6px; }
-    .topgrid svg.hole { min-width: 0; max-height: none; }
-    .topgrid .swipe { display: none; }
+    /* the slider row must span exactly what the drawing spans, or the columns
+       drift a few pixels off the stages they belong to */
+    .inputbar { position: static; box-shadow: none; padding-left: 0; padding-right: 0; }
+    .ibhd, .howto { padding-left: 18px; padding-right: 18px; }
+    .fields { grid-template-columns: 30% 28% 22% 20%; column-gap: 0; }
+    .field { padding: 6px 12px 5px; }
+    .fieldpair { grid-column: auto; border-left: none; padding-left: 12px; }
+    .fields > .field + .field, .fields > .fieldpair { border-left: 1px solid var(--hair); }
+    svg.hole { min-width: 0; max-height: none; }
+    .swipe { display: none; }
   }
 
   footer { margin-top: 54px; padding-top: 18px; border-top: 1px solid var(--line);
@@ -438,9 +441,15 @@
   @media (max-width: 760px) {
     .wrap { padding: 0 14px 72px; }
     /* a finger needs a taller target than a mouse pointer */
-    input[type="range"] { height: 30px; }
-    input[type="range"]::-webkit-slider-thumb { width: 26px; height: 26px; margin-top: -8px; }
-    input[type="range"]::-moz-range-thumb { width: 26px; height: 26px; }
+    input[type="range"] { height: 46px; --tw: 34px; }
+    input[type="range"]::-webkit-slider-runnable-track { height: 14px; border-radius: 7px; }
+    input[type="range"]::-webkit-slider-thumb { width: 34px; height: 34px; margin-top: -10px;
+                                                border-width: 3px; }
+    input[type="range"]::-moz-range-track { height: 14px; border-radius: 7px; }
+    input[type="range"]::-moz-range-thumb { width: 34px; height: 34px; border-width: 3px; }
+    .field { padding: 6px 0 2px; }
+    .frow .out { font-size: 21px; }
+    .fname { font-size: 12.5px; }
     .fields { column-gap: 16px; }
     .out { font-size: 19px; }
     /* the hole is 660px at its narrowest, so it scrolls sideways here */
@@ -468,55 +477,8 @@
 
   <!-- ===== 1. input ===== -->
   <div class="topgrid">
-    <div class="inputbar">
-      <div class="ibhd"><span class="ibno">1</span>
-        <h2>直近ラウンドの数字を入れる</h2>
-        <button class="btn" type="button" id="reset">リセット</button></div>
-      <div class="fields">
-        <div class="field" data-k="drive">
-          <div class="frow"><span class="tag">7</span><span class="fname">ティーショット</span><span class="out" id="r-drive">7<small>/14</small></span><span class="fmark" id="m-drive"></span></div>
-          <input type="range" id="i-drive" min="0" max="14" step="1" value="7" aria-label="ティーショット成功ホール数">
-          <div class="zlab" id="zl-drive"></div>
-        </div>
-        <div class="field" data-k="iron">
-          <div class="frow"><span class="tag">8</span><span class="fname">残り50yまで</span><span class="out" id="r-iron">8<small>/14</small></span><span class="fmark" id="m-iron"></span></div>
-          <input type="range" id="i-iron" min="0" max="14" step="1" value="8" aria-label="50ヤード以内まで運べたホール数">
-          <div class="zlab" id="zl-iron"></div>
-        </div>
-        <div class="fieldpair" data-k="app">
-          <div class="field" data-k="app">
-            <div class="frow"><span class="tag">9</span><span class="fname">アプローチ</span><span class="out" id="r-atry">15<small>回</small></span></div>
-            <input type="range" id="i-atry" min="1" max="40" step="1" value="15" aria-label="50ヤード以内から打った回数">
-            <div class="zlab plain">この数が「9割」の分母</div>
-          </div>
-          <div class="field" data-k="app">
-            <div class="frow"><span class="fname pairname">うち乗った数</span><span class="out" id="r-aon">9<small>回</small></span><span class="fmark" id="m-app"></span></div>
-            <input type="range" id="i-aon" min="0" max="40" step="1" value="9" aria-label="グリーンに乗った回数">
-            <div class="zlab" id="zl-app"></div>
-          </div>
-        </div>
-        <div class="field" data-k="putt">
-          <div class="frow"><span class="tag">38P</span><span class="fname">パット</span><span class="out" id="r-putt">36<small></small></span><span class="fmark" id="m-putt"></span></div>
-          <input type="range" id="i-putt" min="24" max="48" step="1" value="36" aria-label="合計パット数">
-          <div class="zlab" id="zl-putt"></div>
-        </div>
-      </div>
-      <details class="howto">
-        <summary>数え方をくわしく</summary>
-        <dl>
-          <dt>7 ティーショット</dt><dd>パー4・パー5の全14ホールのうち、次にグリーンを狙える所へ行った数。フェアウェイでなくても、素直に前へ打てるライなら成功。</dd>
-          <dt>8 残り50yまで</dt><dd>同じ14ホールのうち、2打目（パー5は3打目）で残り50ヤード以内まで運べた数。グリーンに乗った場合も含む。</dd>
-          <dt>9 アプローチ</dt><dd>50ヤード以内から打った総回数。</dd>
-          <dt>9 うち乗った数</dt><dd>そのうち1打でグリーンに乗った回数。寄ったかどうかは問わない。</dd>
-          <dt>38P パット</dt><dd>18ホールでグリーン上から打った数の合計。カラーからのパターは含めない。</dd>
-        </dl>
-      </details>
-
-    </div>
-
-    <!-- ===== 2. the drawing, kept directly under the sliders ===== -->
-    <div class="mapcol">
-      <h2 class="mapttl">どこで打数をこぼしているか</h2>
+    <h2 class="mapttl">どこで打数をこぼしているか</h2>
+    <div class="panel">
       <div class="plate">
               <div class="holewrap">
                 <svg class="hole anim" viewBox="0 0 960 340" role="img" aria-labelledby="holetitle">
@@ -568,8 +530,54 @@
               </div>
               <div class="swipe">← 横にスワイプするとホール全体が見えます →</div>
       </div>
-      <p class="mapsub">ティーからカップまでの1ホール。<b class="mk-o">○</b>が基準クリア、<b class="mk-x">×</b>が未達です。<b>上のスライダーを動かすと、この図がその場で変わります。</b>扇形の広がり、弾道の長さ、グリーン上の円の大きさは入力した数字に連動します。<b>38パット以内ならグリーン全体が円で埋まり</b>、パットが増えるほど円は小さくなります。基準を満たすと<b class="mk-o">扇形がコース内に収まり、弾道がグリーンに乗ります</b>。届いていないと<b class="mk-x">扇形がコースからはみ出し、弾道はグリーン手前で落ちます</b>。</p>
+      <div class="inputbar">
+        <div class="ibhd"><span class="ibno">1</span>
+          <h2>直近ラウンドの数字を入れる</h2>
+          <button class="btn" type="button" id="reset">リセット</button></div>
+        <div class="fields">
+          <div class="field" data-k="drive">
+            <div class="frow"><span class="tag">7</span><span class="fname">ティーショット</span><span class="out" id="r-drive">7<small>/14</small></span><span class="fmark" id="m-drive"></span></div>
+            <input type="range" id="i-drive" min="0" max="14" step="1" value="7" aria-label="ティーショット成功ホール数">
+            <div class="zlab" id="zl-drive"></div>
+          </div>
+          <div class="field" data-k="iron">
+            <div class="frow"><span class="tag">8</span><span class="fname">残り50yまで</span><span class="out" id="r-iron">8<small>/14</small></span><span class="fmark" id="m-iron"></span></div>
+            <input type="range" id="i-iron" min="0" max="14" step="1" value="8" aria-label="50ヤード以内まで運べたホール数">
+            <div class="zlab" id="zl-iron"></div>
+          </div>
+          <div class="fieldpair" data-k="app">
+            <div class="field" data-k="app">
+              <div class="frow"><span class="tag">9</span><span class="fname">アプローチ</span><span class="out" id="r-atry">15<small>回</small></span></div>
+              <input type="range" id="i-atry" min="1" max="40" step="1" value="15" aria-label="50ヤード以内から打った回数">
+              <div class="zlab plain">この数が「9割」の分母</div>
+            </div>
+            <div class="field" data-k="app">
+              <div class="frow"><span class="fname pairname">うち乗った数</span><span class="out" id="r-aon">9<small>回</small></span><span class="fmark" id="m-app"></span></div>
+              <input type="range" id="i-aon" min="0" max="40" step="1" value="9" aria-label="グリーンに乗った回数">
+              <div class="zlab" id="zl-app"></div>
+            </div>
+          </div>
+          <div class="field" data-k="putt">
+            <div class="frow"><span class="tag">38P</span><span class="fname">パット</span><span class="out" id="r-putt">36<small></small></span><span class="fmark" id="m-putt"></span></div>
+            <input type="range" id="i-putt" min="24" max="48" step="1" value="36" aria-label="合計パット数">
+            <div class="zlab" id="zl-putt"></div>
+          </div>
+        </div>
+        <details class="howto">
+          <summary>数え方をくわしく</summary>
+          <dl>
+            <dt>7 ティーショット</dt><dd>パー4・パー5の全14ホールのうち、次にグリーンを狙える所へ行った数。フェアウェイでなくても、素直に前へ打てるライなら成功。</dd>
+            <dt>8 残り50yまで</dt><dd>同じ14ホールのうち、2打目（パー5は3打目）で残り50ヤード以内まで運べた数。グリーンに乗った場合も含む。</dd>
+            <dt>9 アプローチ</dt><dd>50ヤード以内から打った総回数。</dd>
+            <dt>9 うち乗った数</dt><dd>そのうち1打でグリーンに乗った回数。寄ったかどうかは問わない。</dd>
+            <dt>38P パット</dt><dd>18ホールでグリーン上から打った数の合計。カラーからのパターは含めない。</dd>
+          </dl>
+        </details>
+
+      </div>
     </div>
+    <p class="mapsub">ティーからカップまでの1ホール。<b class="mk-o">○</b>が基準クリア、<b class="mk-x">×</b>が未達です。<b>上のスライダーを動かすと、この図がその場で変わります。</b>扇形の広がり、弾道の長さ、グリーン上の円の大きさは入力した数字に連動します。<b>38パット以内ならグリーン全体が円で埋まり</b>、パットが増えるほど円は小さくなります。基準を満たすと<b class="mk-o">扇形がコース内に収まり、弾道がグリーンに乗ります</b>。届いていないと<b class="mk-x">扇形がコースからはみ出し、弾道はグリーン手前で落ちます</b>。</p>
+
   </div>
 
   <div class="hero" id="hero">
@@ -663,7 +671,7 @@
       <div class="cta">
         <a class="main" href="https://noyamagolf.com/?p=47" target="_blank" rel="noopener noreferrer">
           <b>ラウンドレッスンのご案内 →</b>
-          <span>一緒にコースを回りながら、その場で直します</span>
+          <span>一緒にコースを回りながらレッスンいたします</span>
         </a>
         <a class="line" href="https://lin.ee/2zUywIp" target="_blank" rel="noopener noreferrer">
           <b>スイングチェックツールを無料で受け取る →</b>
@@ -965,8 +973,11 @@
     // A range thumb's centre travels from 9.5px to (width - 9.5px), not 0 to 100%,
     // so the boundary is placed in the thumb's own coordinates. Otherwise the line
     // sits a few pixels away from where the thumb actually stops.
-    var at = function (off) { return "calc((100% - 19px) * " + p.toFixed(5) + " + " + off + "px)"; };
-    var a = at(8.7), b = at(10.3);
+    // --tw is the thumb width for the current screen; the travel is width - tw
+    var at = function (off) {
+      return "calc((100% - var(--tw)) * " + p.toFixed(5) + " + var(--tw) / 2 + " + off + "px)";
+    };
+    var a = at(-0.8), b = at(0.8);
     inp.style.setProperty("--zonebg", dir === "up"
       ? "linear-gradient(to right," + FAIL + " 0 " + a + "," + LINE + " " + a + " " + b + "," +
         PASS + " " + b + " 100%)"
