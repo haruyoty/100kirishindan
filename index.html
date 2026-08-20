@@ -162,6 +162,14 @@
   .frow .tag { margin-bottom: 0; flex: 0 0 auto; }
   .fname { font-size: 11.5px; font-weight: 700; line-height: 1.35; flex: 1 1 auto; min-width: 0; }
   .frow .out { flex: 0 0 auto; font-size: 18px; }
+  .numin { width: 2.6em; font-family: var(--f-num); font-size: 1em; font-weight: 600;
+           font-variant-numeric: tabular-nums; text-align: right; color: inherit;
+           background: transparent; border: 1px solid var(--line); border-radius: 3px;
+           padding: 1px 4px; -moz-appearance: textfield; }
+  .numin::-webkit-outer-spin-button, .numin::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .numin:hover { border-color: var(--accent); }
+  .numin:focus { outline: none; border-color: var(--accent); background: var(--sheet);
+                 box-shadow: 0 0 0 3px var(--accent-sf); }
 
   /* whether this number clears its 789P38 standard */
   .fmark { flex: 0 0 auto; align-self: center; width: 20px; height: 20px; border-radius: 50%;
@@ -441,12 +449,13 @@
   @media (max-width: 760px) {
     .wrap { padding: 0 14px 72px; }
     /* a finger needs a taller target than a mouse pointer */
-    input[type="range"] { height: 46px; --tw: 34px; }
-    input[type="range"]::-webkit-slider-runnable-track { height: 14px; border-radius: 7px; }
-    input[type="range"]::-webkit-slider-thumb { width: 34px; height: 34px; margin-top: -10px;
+    input[type="range"] { height: 58px; --tw: 42px; }
+    input[type="range"]::-webkit-slider-runnable-track { height: 22px; border-radius: 11px; }
+    input[type="range"]::-webkit-slider-thumb { width: 42px; height: 42px; margin-top: -10px;
                                                 border-width: 3px; }
-    input[type="range"]::-moz-range-track { height: 14px; border-radius: 7px; }
-    input[type="range"]::-moz-range-thumb { width: 34px; height: 34px; border-width: 3px; }
+    input[type="range"]::-moz-range-track { height: 22px; border-radius: 11px; }
+    input[type="range"]::-moz-range-thumb { width: 42px; height: 42px; border-width: 3px; }
+    .numin { min-height: 38px; padding: 2px 8px; width: 2.9em; border-color: var(--accent); }
     .field { padding: 6px 0 2px; }
     .frow .out { font-size: 21px; }
     .fname { font-size: 12.5px; }
@@ -536,29 +545,29 @@
           <button class="btn" type="button" id="reset">リセット</button></div>
         <div class="fields">
           <div class="field" data-k="drive">
-            <div class="frow"><span class="tag">7</span><span class="fname">ティーショット</span><span class="out" id="r-drive">7<small>/14</small></span><span class="fmark" id="m-drive"></span></div>
+            <div class="frow"><span class="tag">7</span><span class="fname">ティーショット</span><span class="out"><input class="numin" id="n-drive" type="number" inputmode="numeric" min="0" max="14" step="1" value="7" aria-label="ティーショット成功ホール数（数値入力）"><small>/14</small></span><span class="fmark" id="m-drive"></span></div>
             <input type="range" id="i-drive" min="0" max="14" step="1" value="7" aria-label="ティーショット成功ホール数">
             <div class="zlab" id="zl-drive"></div>
           </div>
           <div class="field" data-k="iron">
-            <div class="frow"><span class="tag">8</span><span class="fname">残り50yまで</span><span class="out" id="r-iron">8<small>/14</small></span><span class="fmark" id="m-iron"></span></div>
+            <div class="frow"><span class="tag">8</span><span class="fname">残り50yまで</span><span class="out"><input class="numin" id="n-iron" type="number" inputmode="numeric" min="0" max="14" step="1" value="8" aria-label="50ヤード以内まで運べたホール数（数値入力）"><small>/14</small></span><span class="fmark" id="m-iron"></span></div>
             <input type="range" id="i-iron" min="0" max="14" step="1" value="8" aria-label="50ヤード以内まで運べたホール数">
             <div class="zlab" id="zl-iron"></div>
           </div>
           <div class="fieldpair" data-k="app">
             <div class="field" data-k="app">
-              <div class="frow"><span class="tag">9</span><span class="fname">アプローチ</span><span class="out" id="r-atry">15<small>回</small></span></div>
+              <div class="frow"><span class="tag">9</span><span class="fname">アプローチ</span><span class="out"><input class="numin" id="n-atry" type="number" inputmode="numeric" min="1" max="40" step="1" value="15" aria-label="50ヤード以内から打った回数（数値入力）"><small>回</small></span></div>
               <input type="range" id="i-atry" min="1" max="40" step="1" value="15" aria-label="50ヤード以内から打った回数">
               <div class="zlab plain">この数が「9割」の分母</div>
             </div>
             <div class="field" data-k="app">
-              <div class="frow"><span class="fname pairname">うち乗った数</span><span class="out" id="r-aon">9<small>回</small></span><span class="fmark" id="m-app"></span></div>
+              <div class="frow"><span class="fname pairname">うち乗った数</span><span class="out"><input class="numin" id="n-aon" type="number" inputmode="numeric" min="0" max="40" step="1" value="9" aria-label="グリーンに乗った回数（数値入力）"><small>回</small></span><span class="fmark" id="m-app"></span></div>
               <input type="range" id="i-aon" min="0" max="40" step="1" value="9" aria-label="グリーンに乗った回数">
               <div class="zlab" id="zl-app"></div>
             </div>
           </div>
           <div class="field" data-k="putt">
-            <div class="frow"><span class="tag">38P</span><span class="fname">パット</span><span class="out" id="r-putt">36<small></small></span><span class="fmark" id="m-putt"></span></div>
+            <div class="frow"><span class="tag">38P</span><span class="fname">パット</span><span class="out"><input class="numin" id="n-putt" type="number" inputmode="numeric" min="24" max="48" step="1" value="36" aria-label="合計パット数（数値入力）"><small></small></span><span class="fmark" id="m-putt"></span></div>
             <input type="range" id="i-putt" min="24" max="48" step="1" value="36" aria-label="合計パット数">
             <div class="zlab" id="zl-putt"></div>
           </div>
@@ -736,7 +745,26 @@
   var TEE_COST = 1.3;   // average strokes lost when a tee shot misses (0.3 chance of 2, else 1)
 
   var el = {};
-  KEYS.forEach(function (k) { el[k] = document.getElementById("i-" + k); el["r_" + k] = document.getElementById("r-" + k); });
+  KEYS.forEach(function (k) { el[k] = document.getElementById("i-" + k); el["n_" + k] = document.getElementById("n-" + k); });
+
+  // typing a number drives the slider; the slider writes back into the field
+  function setNum(k, val) {
+    var n = el["n_" + k];
+    if (n && document.activeElement !== n) n.value = val;   // don't fight the caret
+  }
+  KEYS.forEach(function (k) {
+    var n = el["n_" + k];
+    if (!n) return;
+    n.addEventListener("input", function () {
+      if (n.value === "") return;                            // mid-edit, leave it alone
+      var v = parseInt(n.value, 10);
+      if (isNaN(v)) return;
+      el[k].value = Math.max(+el[k].min, Math.min(+el[k].max, v));
+      render();
+    });
+    n.addEventListener("blur", function () { n.value = el[k].value; });
+    n.addEventListener("keydown", function (e) { if (e.key === "Enter") n.blur(); });
+  });
 
   // ---- seeded PRNG so the same input always gives the same round ----
   function mulberry32(a) {
@@ -946,14 +974,20 @@
       f.addEventListener(e, function () { highlight(f.dataset.k); }); });
     (CAN_HOVER ? ["mouseleave", "focusout"] : ["focusout"]).forEach(function (e) {
       f.addEventListener(e, function () { highlight(null); }); });
-    f.querySelector("input").addEventListener("input", schedule);
+    // the number box now sits before the slider in the markup, so ask for the
+    // slider by type rather than taking whichever input comes first
+    f.querySelector('input[type="range"]').addEventListener("input", schedule);
   });
 
   var rollSeed = 1;
   document.getElementById("reroll").addEventListener("click", function () { rollSeed++; render(); });
   document.getElementById("reset").addEventListener("click", function () {
     el.aon.max = DEFAULTS.atry;
-    Object.keys(DEFAULTS).forEach(function (k) { el[k].value = DEFAULTS[k]; });
+    el.n_aon.max = DEFAULTS.atry;
+    Object.keys(DEFAULTS).forEach(function (k) {
+      el[k].value = DEFAULTS[k];
+      if (el["n_" + k]) el["n_" + k].value = DEFAULTS[k];
+    });
     rollSeed = 1;
     render();
     // confirm the press even when the values were already at their defaults
@@ -998,11 +1032,9 @@
     el.aon.max = atry;
     if (+el.aon.value > atry) el.aon.value = atry;
     var v = { drive: +el.drive.value, iron: +el.iron.value, atry: atry, aon: +el.aon.value, putt: +el.putt.value };
-    el.r_drive.innerHTML = v.drive + "<small>/14</small>";
-    el.r_iron.innerHTML = v.iron + "<small>/14</small>";
-    el.r_atry.innerHTML = v.atry + "<small>回</small>";
-    el.r_aon.innerHTML = v.aon + "<small>回</small>";
-    el.r_putt.innerHTML = v.putt + "<small>パット</small>";
+    el.n_aon.max = atry;                                    // keep the typed cap in step
+    setNum("drive", v.drive); setNum("iron", v.iron); setNum("atry", v.atry);
+    setNum("aon", v.aon); setNum("putt", v.putt);
 
     var pc = function (x) { return Math.max(0, Math.round(x * 100)); };
     var need = Math.ceil(G_APP * atry);
