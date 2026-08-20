@@ -1,0 +1,1262 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>789P38 100切り診断</title>
+<meta name="description" content="789P38理論の4つの技術から、100切りまであと何打かを診断するツール。">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#E7EBE1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1411" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="100切り診断">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:type" content="website">
+<meta property="og:title" content="789P38 100切り診断">
+<meta property="og:description" content="4つの技術から、100切りまであと何打かを診断します。">
+<meta property="og:image" content="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+
+  :root {
+    --page:#E7EBE1; --sheet:#FBFCF8; --sheet-2:#F1F3EC; --line:#CFD6C7; --hair:#E0E5D9;
+    --ink:#17231B; --ink-2:#465248; --muted:#6E7A70;
+    --rough:#BCCDA8; --rough-ln:#A5B893; --fairway:#D3E0BE; --putting:#A9CB8C;
+    --sand:#EADFBC; --tee:#8FA87A;
+    --accent:#1D4A72; --accent-2:#38709F; --accent-sf:#DEE8F0;
+    --good:#2E7B50; --good-sf:#DAEAE0; --warn:#8E6416; --warn-sf:#F0E6CE;
+    --crit:#A63E2C; --crit-sf:#F3DED8; --track:#DBE0D2; --off:#BFC8B7; --zone-pass:#A9D7BB; --lineg:#04833A;
+    --f-disp:"Yu Mincho","游明朝",YuMincho,"Hiragino Mincho ProN","MS PMincho",serif;
+    --f-body:"Yu Gothic","游ゴシック体",YuGothic,"Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI",sans-serif;
+    --f-num:"Roboto Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page:#0D1411; --sheet:#141D18; --sheet-2:#1B2620; --line:#2B3830; --hair:#232F28;
+      --ink:#E6EBE2; --ink-2:#B2BEB4; --muted:#869388;
+      --rough:#1E2E23; --rough-ln:#2C4034; --fairway:#2C4834; --putting:#3E7048;
+      --sand:#4A4331; --tee:#3A5540;
+      --accent:#8CBBE2; --accent-2:#AED2EE; --accent-sf:#1A2B38;
+      --good:#5DB98A; --good-sf:#15301F; --warn:#D3A257; --warn-sf:#332714;
+      --crit:#E4836D; --crit-sf:#38201A; --track:#26312A; --off:#38473E; --zone-pass:#28503A; --lineg:#3ED67F;
+    }
+  }
+  :root[data-theme="light"] {
+    --page:#E7EBE1; --sheet:#FBFCF8; --sheet-2:#F1F3EC; --line:#CFD6C7; --hair:#E0E5D9;
+    --ink:#17231B; --ink-2:#465248; --muted:#6E7A70;
+    --rough:#BCCDA8; --rough-ln:#A5B893; --fairway:#D3E0BE; --putting:#A9CB8C;
+    --sand:#EADFBC; --tee:#8FA87A;
+    --accent:#1D4A72; --accent-2:#38709F; --accent-sf:#DEE8F0;
+    --good:#2E7B50; --good-sf:#DAEAE0; --warn:#8E6416; --warn-sf:#F0E6CE;
+    --crit:#A63E2C; --crit-sf:#F3DED8; --track:#DBE0D2; --off:#BFC8B7; --zone-pass:#A9D7BB; --lineg:#04833A;
+  }
+  :root[data-theme="dark"] {
+    --page:#0D1411; --sheet:#141D18; --sheet-2:#1B2620; --line:#2B3830; --hair:#232F28;
+    --ink:#E6EBE2; --ink-2:#B2BEB4; --muted:#869388;
+    --rough:#1E2E23; --rough-ln:#2C4034; --fairway:#2C4834; --putting:#3E7048;
+    --sand:#4A4331; --tee:#3A5540;
+    --accent:#8CBBE2; --accent-2:#AED2EE; --accent-sf:#1A2B38;
+    --good:#5DB98A; --good-sf:#15301F; --warn:#D3A257; --warn-sf:#332714;
+    --crit:#E4836D; --crit-sf:#38201A; --track:#26312A; --off:#38473E; --zone-pass:#28503A; --lineg:#3ED67F;
+  }
+
+  body { background: var(--page); color: var(--ink); font-family: var(--f-body);
+         font-size: 15px; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 22px 96px; }
+
+  /* ===== masthead ===== */
+  .mast { padding: 26px 0 4px; }
+  .eyebrow { font-family: var(--f-num); font-size: 10.5px; letter-spacing: .2em; color: var(--accent);
+             font-weight: 600; margin: 0 0 10px; display: flex; align-items: center; gap: 12px; }
+  .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  h1 { font-family: var(--f-disp); font-weight: 600; font-size: clamp(22px, 3.2vw, 32px);
+       line-height: 1.25; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede { margin: 0; max-width: 42em; color: var(--ink-2); }
+
+  /* ===== plate ===== */
+  .plate { background: var(--sheet); border: 1px solid var(--line); margin-top: 30px; overflow: hidden; }
+  .plate-hd { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+              padding: 13px 20px; border-bottom: 1px solid var(--line); background: var(--sheet-2); }
+  .plate-hd h2 { font-family: var(--f-disp); font-size: 15px; font-weight: 600; margin: 0; letter-spacing: .04em; }
+  .plate-hd p { margin: 0; font-size: 12px; color: var(--muted); }
+  .plate-hd .par { margin-left: auto; font-family: var(--f-num); font-size: 11px;
+                   letter-spacing: .12em; color: var(--muted); }
+  .holewrap { overflow-x: auto; }
+  svg.hole { display: block; width: 100%; min-width: 660px; height: auto;
+             max-height: min(402px, 44vh); }
+  svg.hole text { font-family: var(--f-num); }
+  .shot { transition: fill .35s, stroke .35s; }
+  .fanshape { fill-opacity: .3; stroke-width: 2; stroke-linejoin: round; }
+  .flight { fill: none; stroke-width: 3.4; stroke-linecap: round; stroke-dasharray: 8 6; }
+  .puttline { fill: none; stroke-width: 5; stroke-linecap: round; }
+  .puttzone { fill-opacity: .85; transition: fill .35s; }
+  .seg-hit { cursor: pointer; }
+  g.stage { transition: opacity .25s; }
+  g.stage.dim { opacity: .3; }
+  g.stage.lit .chip-box { stroke-width: 2; }
+  @keyframes draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .anim .shot { animation: fade .55s ease backwards; }
+  .anim .callout { animation: fade .5s ease backwards; }
+  .anim [data-i="0"] { animation-delay: .10s; }
+  .anim [data-i="1"] { animation-delay: .34s; }
+  .anim [data-i="2"] { animation-delay: .58s; }
+  .anim [data-i="3"] { animation-delay: .80s; }
+
+  /* ===== verdict ===== */
+  .verdict { display: grid; gap: 1px; background: var(--line); border-top: 1px solid var(--line);
+             grid-template-columns: repeat(3, 1fr); }
+  .verdict.two { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 700px) { .verdict { grid-template-columns: 1fr; } }
+  .vcell { background: var(--sheet); padding: 20px 22px 22px; }
+  .vlabel { font-size: 10.5px; letter-spacing: .15em; color: var(--muted); font-weight: 700; margin: 0 0 10px; }
+  .big { font-family: var(--f-num); font-weight: 600; line-height: .92; font-variant-numeric: tabular-nums;
+         letter-spacing: -.02em; font-size: clamp(40px, 6.4vw, 54px); }
+  .big small { font-size: .36em; letter-spacing: 0; margin-left: 3px; color: var(--muted); }
+  .vnote { font-size: 12px; color: var(--ink-2); margin: 11px 0 0; line-height: 1.6; }
+  .meter { height: 7px; background: var(--track); margin-top: 13px; }
+  .meter i { display: block; height: 100%; border-radius: 0 4px 4px 0;
+             transition: width .5s cubic-bezier(.22,.68,.36,1), background-color .3s; }
+  .band { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700;
+          padding: 3px 11px 3px 9px; border-radius: 2px; margin-bottom: 11px; }
+  .band::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .band.good { color: var(--good); background: var(--good-sf); }
+  .band.warn { color: var(--warn); background: var(--warn-sf); }
+  .band.crit { color: var(--crit); background: var(--crit-sf); }
+
+  /* ===== compact input bar ===== */
+  .inputbar { margin-top: 24px; border: 1px solid var(--line); background: var(--sheet); padding: 13px 18px 11px; }
+  /* The bar costs ~300px and the drawing is capped at 44vh, so both fit together
+     from about a 680px-tall window upward. Below that, don't pin. */
+  @media (min-width: 760px) and (min-height: 680px) {
+    .inputbar { position: sticky; top: 0; z-index: 30; border-bottom: 2px solid var(--ink);
+                box-shadow: 0 12px 20px -14px rgba(0, 0, 0, .45); }
+  }
+  .ibhd { display: flex; align-items: center; gap: 11px; margin-bottom: 4px; }
+  .ibno { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: var(--ink);
+          color: var(--page); font-family: var(--f-num); font-size: 14px; font-weight: 700;
+          display: grid; place-items: center; line-height: 1; }
+  .ibhd h2 { font-family: var(--f-disp); font-size: 16px; font-weight: 600; margin: 0; }
+  .ibhd .btn { margin-left: auto; }
+  @keyframes flashbar { from { background: var(--accent-sf); } to { background: var(--sheet); } }
+  .inputbar.flash { animation: flashbar .7s ease-out; }
+  .fields { display: grid; gap: 2px 20px; grid-template-columns: 1fr 1fr; align-items: start; }
+  @media (min-width: 760px) { .fields { grid-template-columns: repeat(4, 1fr); } }
+  .fieldpair { grid-column: span 2; border-left: 2px solid var(--accent-sf); padding-left: 14px; }
+  @media (min-width: 760px) { .fieldpair { grid-column: auto; } }
+  .fieldpair .field:last-child { padding-top: 2px; }
+  .pairname::before { content: "\21B3"; font-family: var(--f-num); color: var(--accent);
+                      margin-right: 5px; font-weight: 700; }
+  .field { padding: 7px 0 6px; border-top: none; position: relative; }
+  .field.lit { background: none; }
+  .fname { font-size: 12px; font-weight: 700; line-height: 1.4; margin-top: 2px; padding-right: 26px; }
+
+  /* whether this number clears its 789P38 standard */
+  .fmark { position: absolute; top: 4px; right: 0; width: 23px; height: 23px; border-radius: 50%;
+           display: grid; place-items: center; font-size: 13px; font-weight: 700; line-height: 1; }
+  .fmark.good { color: var(--good); background: var(--good-sf); }
+  .fmark.warn { color: var(--warn); background: var(--warn-sf); }
+  .fmark.crit { color: var(--crit); background: var(--crit-sf); }
+  .field.st-good .out { color: var(--good); }
+  .field.st-warn .out { color: var(--warn); }
+  .field.st-crit .out { color: var(--crit); }
+  .field.st-good input[type="range"] { --thumb: var(--good); }
+  .field.st-warn input[type="range"] { --thumb: var(--warn); }
+  .field.st-crit input[type="range"] { --thumb: var(--crit); }
+  .fieldpair.st-good { border-left-color: var(--good); }
+  .fieldpair.st-warn { border-left-color: var(--warn); }
+  .fieldpair.st-crit { border-left-color: var(--crit); }
+  .fsub { font-size: 10.5px; color: var(--muted); line-height: 1.45; margin-top: 3px; }
+  .howto { border-top: 1px solid var(--hair); margin-top: 4px; }
+  .howto > summary { cursor: pointer; font-size: 12px; color: var(--accent); padding: 7px 0 2px; }
+  .howto dl { margin: 6px 0 10px; font-size: 12px; line-height: 1.7; }
+  .howto dt { font-family: var(--f-num); font-weight: 700; color: var(--ink); margin-top: 8px; }
+  .howto dd { margin: 0; color: var(--ink-2); }
+
+  /* ===== the one answer ===== */
+  .hero { margin-top: 26px; border: 2px solid var(--crit); background: var(--crit-sf);
+          padding: 26px 24px 22px; text-align: center; }
+  .hero.ok { border-color: var(--good); background: var(--good-sf); }
+  .herolab { font-size: 11.5px; letter-spacing: .16em; color: var(--ink-2); font-weight: 700;
+             margin: 0 0 12px; white-space: nowrap; }
+  .herogrid { display: grid; gap: 22px; }
+  @media (min-width: 680px) { .herogrid { grid-template-columns: 1fr 1fr; gap: 0; } }
+  .herocell { display: flex; flex-direction: column; align-items: center; padding: 2px 16px; }
+  @media (min-width: 680px) { .herocell + .herocell { border-left: 1px solid var(--line); } }
+  .herofig { font-family: var(--f-disp); font-weight: 600; line-height: 1; color: var(--crit);
+             display: flex; align-items: baseline; gap: 3px; font-size: clamp(17px, 2.3vw, 24px); }
+  .hero.ok .herofig { color: var(--good); }
+  .herofig b { font-family: var(--f-num); font-weight: 600; line-height: .92; letter-spacing: -.035em;
+               font-variant-numeric: tabular-nums; font-size: clamp(60px, 10.5vw, 108px); }
+  .herofig small { font-size: clamp(19px, 2.8vw, 29px); font-weight: 600; color: var(--muted); }
+  .herosub { font-size: clamp(14px, 1.9vw, 17px); font-weight: 700; margin: 22px 0 0; color: var(--ink); }
+  .hero .band { margin: 12px 0 0; }
+  .mapttl { font-family: var(--f-disp); font-size: clamp(17px, 2.2vw, 21px); font-weight: 600;
+            margin: 12px 0 6px; letter-spacing: .02em; }
+  .mapsub { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.7; }
+  .mapsub b { font-size: 1.15em; }
+  .mapsub .mk-o { color: var(--good); }
+  .mapsub .mk-x { color: var(--crit); }
+  .herobar { height: 9px; background: var(--track); margin: 18px auto 0; width: min(240px, 80%); }
+  .herobar i { display: block; height: 100%; border-radius: 0 5px 5px 0;
+               transition: width .5s cubic-bezier(.22,.68,.36,1), background-color .3s; }
+  .herofoot { font-size: 12.5px; color: var(--ink-2); margin: 10px 0 0; }
+
+  /* ===== the one instruction ===== */
+  .act { margin-top: 18px; border: 1px solid var(--line); border-left: 6px solid var(--accent);
+         background: var(--sheet); padding: 20px 24px 21px; }
+  .actlab { font-size: 11px; letter-spacing: .18em; color: var(--muted); font-weight: 700; margin: 0 0 7px; }
+  .actmain { font-family: var(--f-disp); font-size: clamp(19px, 2.9vw, 27px); font-weight: 600;
+             margin: 0; line-height: 1.35; }
+  .actsub { font-size: 13px; color: var(--ink-2); margin: 9px 0 0; }
+
+  /* ===== folded detail ===== */
+  .more { margin-top: 32px; border-top: 1px solid var(--line); }
+  .more > summary { cursor: pointer; padding: 17px 0; font-family: var(--f-disp); font-size: 17px;
+                    font-weight: 600; list-style: none; display: flex; align-items: center; gap: 10px; }
+  .more > summary::-webkit-details-marker { display: none; }
+  .more > summary::before { content: "\FF0B"; font-family: var(--f-num); color: var(--accent); font-weight: 700; }
+  .more[open] > summary::before { content: "\2212"; }
+  .morebody { padding-bottom: 8px; }
+  .morebody > .sechd:first-child { margin-top: 6px; }
+
+  .sechd { font-family: var(--f-disp); font-size: 17px; font-weight: 600; margin: 38px 0 3px;
+           letter-spacing: .02em; }
+
+  .sub { margin: 0 0 20px; font-size: 12.5px; color: var(--muted); }
+
+  /* ===== inputs ===== */
+  .tag { display: inline-block; font-family: var(--f-num); font-size: 10.5px; font-weight: 700;
+         color: var(--accent); background: var(--accent-sf); padding: 1px 6px; border-radius: 2px;
+         letter-spacing: .04em; margin-bottom: 3px; }
+  .out { font-family: var(--f-num); font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums;
+         line-height: 1.1; white-space: nowrap; }
+  .out small { font-size: 11px; color: var(--muted); font-weight: 500; margin-left: 2px; }
+  /* The track is painted with a gradient that switches colour exactly at the
+     789P38 standard, so the passing stretch is visible before anything is moved.
+     --zonebg is set per slider in JS; custom properties reach the pseudo-element. */
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; margin: 0;
+                        height: 20px; cursor: pointer; background: transparent; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 9px; border-radius: 5px; background: var(--zonebg, var(--track)); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 19px; height: 19px; margin-top: -5px;
+    border-radius: 50%; background: var(--thumb, var(--ink)); border: 2px solid var(--sheet);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .35); }
+  input[type="range"]::-moz-range-track {
+    height: 9px; border-radius: 5px; background: var(--zonebg, var(--track)); }
+  input[type="range"]::-moz-range-thumb {
+    width: 19px; height: 19px; border-radius: 50%; background: var(--thumb, var(--ink));
+    border: 2px solid var(--sheet); box-shadow: 0 1px 3px rgba(0, 0, 0, .35); }
+  input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .zlab { font-family: var(--f-num); font-size: 9.5px; color: var(--muted); font-weight: 500;
+          line-height: 1.5; margin-top: 2px; }
+  .zlab b { font-size: 12.5px; font-weight: 700; color: var(--ink); margin-right: 1px; }
+  .field.st-good .zlab b { color: var(--good); }
+  .field.st-warn .zlab b { color: var(--warn); }
+  .field.st-crit .zlab b { color: var(--crit); }
+  .zlab.plain { color: var(--muted); font-weight: 500; }
+  .resetbar { padding-top: 18px; border-top: 1px solid var(--line); }
+  button.btn { font-family: var(--f-body); font-size: 12px; color: var(--ink-2); background: var(--sheet);
+               border: 1px solid var(--line); padding: 7px 14px; border-radius: 2px; cursor: pointer; }
+  button.btn:hover { background: var(--sheet-2); color: var(--ink); }
+  button.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ===== distribution ===== */
+  .dist { border: 1px solid var(--line); background: var(--sheet); position: relative; }
+  .dist-hd { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 12px 18px;
+             border-bottom: 1px solid var(--line); background: var(--sheet-2); }
+  .dist-hd b { font-family: var(--f-disp); font-size: 14px; font-weight: 600; }
+  .dist-hd span { font-size: 11.5px; color: var(--muted); }
+  .rangewrap { padding: 4px 18px 18px; }
+  .rangelab { font-size: 10.5px; letter-spacing: .14em; color: var(--muted); font-weight: 700; margin: 15px 0 2px; }
+  #rangebar { display: block; width: 100%; height: auto; }
+  #rangebar text { font-family: var(--f-num); }
+  .rangenote { margin: 3px 0 0; font-size: 12px; color: var(--ink-2); }
+  .distfoot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line);
+              border-top: 1px solid var(--line); }
+  .distfoot div { background: var(--sheet); padding: 11px 16px 13px; }
+  .distfoot dt { font-size: 10px; letter-spacing: .12em; color: var(--muted); font-weight: 700; margin: 0 0 3px; }
+  .distfoot dd { margin: 0; font-family: var(--f-num); font-size: 19px; font-weight: 600;
+                 font-variant-numeric: tabular-nums; }
+
+  /* ===== scorecard ===== */
+  .sc { border: 1px solid var(--line); background: var(--sheet); }
+  .sc-hd { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 18px;
+           border-bottom: 1px solid var(--line); background: var(--sheet-2); }
+  .sc-hd b { font-family: var(--f-disp); font-size: 14px; font-weight: 600; }
+  .sc-hd span { font-size: 11.5px; color: var(--muted); }
+  .sc-hd button { margin-left: auto; }
+  .sc-body { padding: 4px 0 0; overflow-x: auto; }
+  table.card { width: 100%; border-collapse: collapse; font-family: var(--f-num);
+               font-variant-numeric: tabular-nums; min-width: 560px; }
+  table.card th, table.card td { text-align: center; padding: 7px 2px; font-size: 12.5px;
+                                 border-bottom: 1px solid var(--hair); font-weight: 500; }
+  table.card thead th { font-size: 10px; color: var(--muted); letter-spacing: .06em;
+                        border-bottom: 1px solid var(--line); font-weight: 700; }
+  table.card th.rh { text-align: left; padding-left: 18px; font-size: 10px; letter-spacing: .12em;
+                     color: var(--muted); font-weight: 700; width: 74px; }
+  table.card td.tot, table.card th.tot { background: var(--sheet-2); font-weight: 700; }
+  table.card tr.sr td { font-size: 15px; font-weight: 600; }
+  td.b  { color: var(--accent); }
+  td.p  { color: var(--good); }
+  td.bo { color: var(--ink); }
+  td.d  { color: var(--warn); }
+  td.t  { color: var(--crit); }
+  td.sq { position: relative; }
+  td.b span, td.p span { display: inline-grid; place-items: center; width: 22px; height: 22px;
+                         border-radius: 50%; border: 1.5px solid currentColor; }
+  td.d span, td.t span { display: inline-grid; place-items: center; width: 22px; height: 22px;
+                         border: 1.5px solid currentColor; }
+  .sc-legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 11px 18px 13px;
+               border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+  .sc-legend i { display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; }
+
+  /* ===== stage cards ===== */
+  .stages { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  @media (min-width: 620px) { .stages { grid-template-columns: 1fr 1fr; } }
+  .card2 { background: var(--sheet); padding: 16px 18px 17px; transition: background .2s; }
+  .card2.lit { background: var(--sheet-2); }
+  .chead { display: flex; align-items: baseline; gap: 9px; margin-bottom: 3px; }
+  .cname { font-size: 12.5px; font-weight: 700; line-height: 1.5; }
+  .closs { margin-left: auto; font-family: var(--f-num); font-size: 15px; font-weight: 600;
+           font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .cfig { font-family: var(--f-num); font-size: 11.5px; color: var(--muted);
+          font-variant-numeric: tabular-nums; margin: 8px 0 7px; }
+  .cfig b { color: var(--ink); font-weight: 600; }
+  .ctrack { position: relative; height: 9px; background: var(--track); }
+  .ctrack i { position: absolute; inset: 0 auto 0 0; border-radius: 0 3px 3px 0;
+              transition: width .5s cubic-bezier(.22,.68,.36,1), background-color .3s; }
+  .ctrack u { position: absolute; top: -3px; bottom: -3px; left: 78%; width: 2px; background: var(--ink); opacity: .5; }
+  .cfoot { font-size: 11.5px; margin-top: 9px; line-height: 1.55; }
+
+  /* ===== gains ===== */
+  .gains { border-top: 1px solid var(--line); }
+  .grow { padding: 12px 0 13px; border-bottom: 1px solid var(--hair); }
+  .ghead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; }
+  .gname { font-size: 12.5px; font-weight: 700; }
+  .gval { margin-left: auto; font-family: var(--f-num); font-size: 15px; font-weight: 600;
+          font-variant-numeric: tabular-nums; color: var(--accent); }
+  .gtrack { height: 9px; background: var(--track); }
+  .gtrack i { display: block; height: 100%; background: var(--accent); border-radius: 0 3px 3px 0;
+              transition: width .5s cubic-bezier(.22,.68,.36,1); }
+  .gnote { font-family: var(--f-num); font-size: 11px; color: var(--muted); margin-top: 6px;
+           font-variant-numeric: tabular-nums; }
+
+  /* ===== prescription ===== */
+  .rx { border: 1px solid var(--line); background: var(--sheet); margin-top: 22px; }
+  .rxhd { padding: 15px 22px; border-bottom: 1px solid var(--line); background: var(--sheet-2); }
+  .rxhd .k { font-family: var(--f-num); font-size: 10.5px; letter-spacing: .16em; color: var(--accent);
+             font-weight: 700; display: block; margin-bottom: 4px; }
+  .rxhd h4 { font-family: var(--f-disp); font-size: 17px; font-weight: 600; margin: 0; }
+  .rxbd { padding: 18px 22px 20px; }
+  .rxwhy { font-size: 12.5px; color: var(--muted); margin: 0 0 16px; }
+  .rx ol { margin: 0; padding: 0; list-style: none; counter-reset: rx; }
+  .rx li { counter-increment: rx; position: relative; padding-left: 30px; margin-bottom: 12px;
+           font-size: 13.5px; color: var(--ink-2); line-height: 1.7; }
+  .rx li:last-child { margin-bottom: 0; }
+  .rx li::before { content: counter(rx); position: absolute; left: 0; top: 3px; font-family: var(--f-num);
+                   font-size: 10.5px; font-weight: 700; color: var(--accent); width: 19px; height: 19px;
+                   border: 1px solid var(--accent); border-radius: 50%; display: grid; place-items: center; line-height: 1; }
+  .rx li b { color: var(--ink); }
+
+  /* ===== lessons ===== */
+  .promo { margin-top: 36px; border: 1px solid var(--line); background: var(--sheet); }
+  .promo-hd { display: flex; gap: 16px; align-items: center; padding: 16px 20px;
+              border-bottom: 1px solid var(--line); background: var(--sheet-2); }
+  .promo-hd img { width: 78px; height: 78px; border-radius: 50%; object-fit: cover;
+                  object-position: 50% 18%; flex: 0 0 auto; background: #EDF0E9;
+                  border: 2px solid var(--sheet); box-shadow: 0 1px 5px rgba(0, 0, 0, .2); }
+  .promo-name { font-family: var(--f-disp); font-size: 20px; font-weight: 600; margin: 0; }
+  .promo-role { font-size: 11px; letter-spacing: .12em; color: var(--muted); font-weight: 700; margin: 4px 0 0; }
+  .promo-bd { padding: 18px 20px 20px; }
+  .promo-lead { margin: 0 0 16px; font-size: 13.5px; color: var(--ink-2); line-height: 1.85; }
+  .cta { display: grid; gap: 10px; }
+  @media (min-width: 700px) { .cta { grid-template-columns: 1fr 1fr; } }
+  .cta a { display: flex; flex-direction: column; gap: 4px; text-decoration: none; border-radius: 3px;
+           border: 1px solid var(--line); border-left-width: 5px; padding: 13px 16px; background: var(--sheet);
+           transition: transform .15s, box-shadow .15s, background .15s; }
+  .cta a:hover { transform: translateY(-1px); box-shadow: 0 4px 12px -6px rgba(0, 0, 0, .38);
+                 background: var(--sheet-2); }
+  .cta a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .cta b { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+  .cta span { font-size: 11.5px; color: var(--muted); line-height: 1.6; }
+  .cta a.main { grid-column: 1 / -1; border-left-color: var(--accent); }
+  .cta a.main b { color: var(--accent); }
+  .cta a.line { border-left-color: var(--lineg); }
+  .cta a.line b { color: var(--lineg); }
+
+  footer { margin-top: 54px; padding-top: 18px; border-top: 1px solid var(--line);
+           font-size: 11.5px; color: var(--muted); line-height: 1.8; }
+  footer p { margin: 0 0 6px; } footer p:last-child { margin: 0; }
+
+  /* ===== phones ===== */
+  .holewrap, .sc-body { -webkit-overflow-scrolling: touch; }
+  .swipe { display: none; }
+
+  @media (max-width: 760px) {
+    .wrap { padding: 0 14px 72px; }
+    /* a finger needs a taller target than a mouse pointer */
+    input[type="range"] { height: 30px; }
+    input[type="range"]::-webkit-slider-thumb { width: 26px; height: 26px; margin-top: -8px; }
+    input[type="range"]::-moz-range-thumb { width: 26px; height: 26px; }
+    .fields { column-gap: 16px; }
+    .out { font-size: 19px; }
+    /* the hole is 660px at its narrowest, so it scrolls sideways here */
+    svg.hole { max-height: none; }
+    .swipe { display: block; font-family: var(--f-num); font-size: 10.5px; color: var(--muted);
+             text-align: center; padding: 6px 0 8px; }
+    .mapsub { font-size: 12px; }
+    .btn, button.btn { min-height: 40px; }
+    .more > summary, .howto > summary { min-height: 40px; display: flex; align-items: center; }
+  }
+  @media (max-width: 430px) {
+    .fields { grid-template-columns: 1fr; }
+    .fieldpair { grid-column: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">789P38 THEORY / 100切り診断</p>
+    <h1>100切りまで、<em>あと何打か。</em></h1>
+  </header>
+
+  <!-- ===== 1. input ===== -->
+  <div class="inputbar">
+    <div class="ibhd"><span class="ibno">1</span>
+      <h2>直近ラウンドの数字を入れる</h2>
+      <button class="btn" type="button" id="reset">リセット</button></div>
+    <div class="fields">
+      <div class="field" data-k="drive">
+        <span class="tag">7</span>
+        <span class="fmark" id="m-drive"></span>
+        <div class="fname">ティーショット</div>
+        <div class="out" id="r-drive">7<small>/14</small></div>
+        <input type="range" id="i-drive" min="0" max="14" step="1" value="7" aria-label="ティーショット成功ホール数">
+        <div class="zlab" id="zl-drive"></div>
+        <div class="fsub">次を狙える所へ行った数</div>
+      </div>
+      <div class="field" data-k="iron">
+        <span class="tag">8</span>
+        <span class="fmark" id="m-iron"></span>
+        <div class="fname">残り50yまで</div>
+        <div class="out" id="r-iron">8<small>/14</small></div>
+        <input type="range" id="i-iron" min="0" max="14" step="1" value="8" aria-label="50ヤード以内まで運べたホール数">
+        <div class="zlab" id="zl-iron"></div>
+        <div class="fsub">2打目で運べた数</div>
+      </div>
+      <div class="fieldpair" data-k="app">
+        <div class="field" data-k="app">
+          <span class="tag">9</span>
+          <div class="fname">アプローチ</div>
+          <div class="out" id="r-atry">15<small>回</small></div>
+          <input type="range" id="i-atry" min="1" max="40" step="1" value="15" aria-label="50ヤード以内から打った回数">
+          <div class="zlab plain">この数が「9割」の分母</div>
+          <div class="fsub">50y以内から打った数</div>
+        </div>
+        <div class="field" data-k="app">
+          <span class="fmark" id="m-app"></span>
+          <div class="fname pairname">うち乗った数</div>
+          <div class="out" id="r-aon">9<small>回</small></div>
+          <input type="range" id="i-aon" min="0" max="40" step="1" value="9" aria-label="グリーンに乗った回数">
+          <div class="zlab" id="zl-app"></div>
+          <div class="fsub">1打でグリーンオン</div>
+        </div>
+      </div>
+      <div class="field" data-k="putt">
+        <span class="tag">38P</span>
+        <span class="fmark" id="m-putt"></span>
+        <div class="fname">パット</div>
+        <div class="out" id="r-putt">36<small></small></div>
+        <input type="range" id="i-putt" min="24" max="48" step="1" value="36" aria-label="合計パット数">
+        <div class="zlab" id="zl-putt"></div>
+        <div class="fsub">18ホール合計</div>
+      </div>
+    </div>
+    <details class="howto">
+      <summary>数え方をくわしく</summary>
+      <dl>
+        <dt>7 ティーショット</dt><dd>パー4・パー5の全14ホールのうち、次にグリーンを狙える所へ行った数。フェアウェイでなくても、素直に前へ打てるライなら成功。</dd>
+        <dt>8 残り50yまで</dt><dd>同じ14ホールのうち、2打目（パー5は3打目）で残り50ヤード以内まで運べた数。グリーンに乗った場合も含む。</dd>
+        <dt>9 アプローチ</dt><dd>50ヤード以内から打った総回数。</dd>
+        <dt>9 うち乗った数</dt><dd>そのうち1打でグリーンに乗った回数。寄ったかどうかは問わない。</dd>
+        <dt>38P パット</dt><dd>18ホールでグリーン上から打った数の合計。カラーからのパターは含めない。</dd>
+      </dl>
+    </details>
+
+  </div>
+
+  <!-- ===== 2. the drawing, kept directly under the sliders ===== -->
+  <h2 class="mapttl">どこで打数をこぼしているか</h2>
+  <div class="plate">
+          <div class="holewrap">
+            <svg class="hole anim" viewBox="0 0 960 340" role="img" aria-labelledby="holetitle">
+              <title id="holetitle">ティーからカップまでの4区間と、各区間の失点</title>
+              <defs>
+                <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+                  <line x1="0" y1="0" x2="0" y2="8" stroke="var(--rough-ln)" stroke-width="1"/>
+                </pattern>
+              </defs>
+
+              <path d="M 66 226 C 250 224, 336 190, 468 178 C 610 164, 730 150, 878 136"
+                    fill="none" stroke="var(--rough)" stroke-width="146" stroke-linecap="round"/>
+              <path d="M 66 226 C 250 224, 336 190, 468 178 C 610 164, 730 150, 878 136"
+                    fill="none" stroke="url(#hatch)" stroke-width="146" stroke-linecap="round" opacity=".55"/>
+              <path d="M 66 226 C 250 224, 336 190, 468 178 C 610 164, 730 150, 878 136"
+                    fill="none" stroke="var(--fairway)" stroke-width="92" stroke-linecap="round"/>
+
+              <ellipse cx="404" cy="252" rx="34" ry="15" fill="var(--sand)"/>
+              <ellipse cx="786" cy="206" rx="26" ry="12" fill="var(--sand)"/>
+              <ellipse cx="866" cy="136" rx="68" ry="48" fill="var(--putting)" stroke="var(--tee)" stroke-width="1.5"/>
+              <ellipse class="shot puttzone" data-i="3" id="putt-zone" cx="866" cy="136"
+                       stroke="var(--sheet)" stroke-width="2"></ellipse>
+
+              <rect x="42" y="214" width="30" height="24" rx="2" fill="var(--tee)"/>
+              <text x="57" y="256" fill="var(--ink-2)" font-size="11" text-anchor="middle" letter-spacing="1">TEE</text>
+
+              <line x1="616" y1="96" x2="616" y2="212" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 4" opacity=".38"/>
+              <text x="616" y="230" fill="var(--ink-2)" font-size="11" text-anchor="middle">残り50y</text>
+
+              <g id="shots">
+                <path   class="shot fanshape" data-i="0" id="shot-drive"></path>
+                <path   class="shot fanshape" data-i="1" id="shot-iron"></path>
+                <path   class="shot flight"   data-i="2" id="shot-app"></path>
+                <circle class="shot"          data-i="2" id="ball-app" r="6.5"></circle>
+                <path   class="shot puttline" data-i="3" id="shot-putt"
+                        d="M 824 142 C 844 140, 862 138, 874 137"></path>
+              </g>
+
+              <circle cx="878" cy="136" r="4.5" fill="var(--ink)"/>
+              <g id="callouts"></g>
+
+              <g id="hits" fill="none" stroke="transparent" stroke-width="46" stroke-linecap="round">
+                <path class="seg-hit" data-k="drive" d="M 70 226 C 180 225, 236 208, 318 195"/>
+                <path class="seg-hit" data-k="iron"  d="M 336 192 C 400 184, 470 178, 596 166"/>
+                <path class="seg-hit" data-k="app"   d="M 614 164 C 680 157, 748 150, 806 144"/>
+                <path class="seg-hit" data-k="putt"  d="M 824 142 C 844 140, 862 138, 874 137"/>
+              </g>
+            </svg>
+          </div>
+          <div class="swipe">← 横にスワイプするとホール全体が見えます →</div>
+  </div>
+  <p class="mapsub">ティーからカップまでの1ホール。<b class="mk-o">○</b>が基準クリア、<b class="mk-x">×</b>が未達です。<b>上のスライダーを動かすと、この図がその場で変わります。</b>扇形の広がり、弾道の長さ、グリーン上の円の大きさは入力した数字に連動します。<b>38パット以内ならグリーン全体が円で埋まり</b>、パットが増えるほど円は小さくなります。基準を満たすと<b class="mk-o">扇形がコース内に収まり、弾道がグリーンに乗ります</b>。届いていないと<b class="mk-x">扇形がコースからはみ出し、弾道はグリーン手前で落ちます</b>。</p>
+
+  <div class="hero" id="hero">
+    <div class="herogrid">
+      <div class="herocell">
+        <p class="herolab">100切りの可能性</p>
+        <div class="herofig"><b id="prob">—</b><small>%</small></div>
+        <div class="herobar"><i id="probbar" style="width:0%"></i></div>
+      </div>
+      <div class="herocell">
+        <p class="herolab">100切りまで</p>
+        <div class="herofig">あと<b id="gap-n">—</b><small>打</small></div>
+      </div>
+    </div>
+    <p class="herosub" id="hero-sub"></p>
+    <div class="band" id="band">判定中</div>
+    <p class="herofoot" id="probnote"></p>
+  </div>
+
+  <!-- ===== 3. what to do ===== -->
+  <div class="act">
+    <p class="actlab">いちばん効くのは</p>
+    <p class="actmain" id="act-main">—</p>
+    <p class="actsub" id="act-sub"></p>
+  </div>
+
+  <!-- ===== everything else, folded away ===== -->
+  <details class="more">
+    <summary>くわしく見る</summary>
+    <div class="morebody">
+
+      <h3 class="sechd">出るスコアの幅</h3>
+      <p class="sub">同じ技術でも、日によってこれだけ振れます。</p>
+      <div class="dist">
+        <div class="rangewrap">
+          <svg id="rangebar" viewBox="0 0 720 104" role="img" aria-labelledby="ranget">
+            <title id="ranget">ベストからワーストまでのスコアの広がり</title></svg>
+          <p class="rangenote" id="rangenote"></p>
+        </div>
+        <div class="distfoot">
+          <div><dt>ベスト</dt><dd id="s-best">—</dd></div>
+          <div><dt>平均</dt><dd id="s-typ">—</dd></div>
+          <div><dt>ワースト</dt><dd id="s-worst">—</dd></div>
+        </div>
+      </div>
+
+      <div class="verdict two">
+        <div class="vcell"><p class="vlabel">平均スコア</p>
+          <div class="big" id="score">—</div><p class="vnote" id="scorenote"></p></div>
+        <div class="vcell"><p class="vlabel">789P38 基準との差</p>
+          <div class="big" id="excess">—</div><p class="vnote" id="excessnote"></p></div>
+      </div>
+
+      <h3 class="sechd">ある1ラウンドのスコアカード</h3>
+      <p class="sub">4000ラウンドから1枚引いたものです。同じ技術でも、日によってこれだけ変わります。</p>
+      <div class="sc">
+        <div class="sc-hd"><b id="sc-total">—</b><span id="sc-vs"></span>
+          <button class="btn" type="button" id="reroll">もう1ラウンド回る</button></div>
+        <div class="sc-body" id="sc-body"></div>
+        <div class="sc-legend">
+          <span><i style="background:var(--accent)"></i>バーディ以下</span>
+          <span><i style="background:var(--good)"></i>パー</span>
+          <span><i style="background:var(--ink)"></i>ボギー</span>
+          <span><i style="background:var(--warn)"></i>ダブルボギー</span>
+          <span><i style="background:var(--crit)"></i>トリプル以上</span>
+        </div>
+      </div>
+
+      <h3 class="sechd">4区間の内訳</h3>      <h3 class="sechd">4区間の内訳</h3>
+      <p class="sub">縦線が789P38理論の基準値です。</p>
+      <div class="stages" id="stages"></div>
+
+      <h3 class="sechd">どこを直すと、何打縮むか</h3>
+      <p class="sub">その1区間だけを基準まで引き上げた場合の短縮打数。</p>
+      <div class="gains" id="gains"></div>
+
+      <div class="rx" id="rx"></div>
+    </div>
+  </details>
+
+  <section class="promo">
+    <div class="promo-hd">
+      <img src="noyama.png" alt="野山佳治" width="78" height="78">
+      <div>
+        <p class="promo-name">野山佳治</p>
+        <p class="promo-role">ゴルフ ティーチングプロ</p>
+      </div>
+    </div>
+    <div class="promo-bd">
+      <p class="promo-lead">診断で弱点が分かったら、コースで実際にどのようにプレーしたらいいかをラウンドレッスンにてお伝えいたします。是非ご参加ください。</p>
+      <div class="cta">
+        <a class="main" href="https://noyamagolf.com/?p=47" target="_blank" rel="noopener noreferrer">
+          <b>ラウンドレッスンのご案内 →</b>
+          <span>一緒にコースを回りながら、その場で直します</span>
+        </a>
+        <a class="line" href="https://lin.ee/2zUywIp" target="_blank" rel="noopener noreferrer">
+          <b>スイングチェックツールを無料で受け取る →</b>
+          <span>LINE登録でプレゼント</span>
+        </a>
+        <a href="https://noyamagolf.com/" target="_blank" rel="noopener noreferrer">
+          <b>ホームページ →</b>
+          <span>noyamagolf.com</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>前提：パー72（アウト 4-5-3-4-4-3-5-4-4／イン 4-3-4-5-4-4-3-5-4）。シミュレーションは1ホールずつ、ティーショット・運び・乗せ・パットの成否をあなたの成功率で抽選して打数を積み上げます。同じ入力なら毎回同じ結果が出るよう乱数を固定しているため、スライダーを戻せば元の数字に戻ります。</p>
+    <p>失点マップの数値は「基準どおりに回る人との差」。区間の太さは失点の大きさを表します。パー3のティーショットは、8（運ぶ技術）と9（乗せる技術）に半分ずつ割り振っています。</p>
+    <p>コース難易度・距離・天候・グリーン速度・傾斜は考慮していません。あくまで4つの技術だけから見た計算結果です。</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var SVGNS = "http://www.w3.org/2000/svg";
+
+  var STAGES = [
+    { k: "drive", tag: "7",   sh: "ティーショット", name: "次が狙える所に置く",     goal: "10/14 (7割)", cx: 204, cy: 196, my: 215 },
+    { k: "iron",  tag: "8",   sh: "アイアン", name: "残り50ヤードまで運ぶ",   goal: "12/14 (8割)", cx: 443, cy: 161, my: 180 },
+    { k: "app",   tag: "9",   sh: "アプローチ", name: "50ヤード以内から乗せる", goal: "9割",         cx: 713, cy: 173, my: 192 },
+    { k: "putt",  tag: "38P", sh: "パット", name: "38パット以内に収める",   goal: "38パット",    cx: 878, cy: 136, my: 170 }
+  ];
+
+  var RX = {
+    drive: { head: "7 — ティーショットで、次が狙える所に置く",
+      why: "ティーショットが崩れると、その後の3打がまるごとリカバリーになります。曲がり幅ではなく、次に素直に打てるかどうかが基準です。",
+      items: ["<b>飛距離ではなく「振り切れる番手」で打つ。</b>ドライバーで7割入らないうちは、3W・ユーティリティを持つホールを4つ作る。",
+              "<b>狙いを中央ではなく「広い側」に置く。</b>OBや池のない方向へ、外しても許される側を選ぶ。",
+              "<b>練習場では10球連続で同じ方向に出す。</b>飛距離のばらつきより、方向のばらつきを先に潰す。"] },
+    iron: { head: "8 — アイアンで、残り50ヤードまで運ぶ",
+      why: "グリーンを直接狙って外すより、残り50ヤードへ確実に運ぶほうがスコアは縮みます。刻む勇気が8の正体です。",
+      items: ["<b>グリーンではなく、残り50ヤード地点を狙う。</b>「届く番手」ではなく「振り切れる番手」を持つ。",
+              "<b>ライが悪いときは迷わずレイアップ。</b>つま先上がり・深いラフ・傾斜は、無理をした瞬間に2打を失う。",
+              "<b>8割の振り幅で同じ距離が出る番手を1本作る。</b>フルショットの最大飛距離は当てにしない。"] },
+    app: { head: "9 — 50ヤード以内から、グリーンに乗せる",
+      why: "ザックリ・トップの1発が、そのホールを一気に大叩きへ変えます。寄せワンを狙う前に、まず「必ず乗せる」を作ります。",
+      items: ["<b>アプローチは1本のクラブに絞る。</b>PWか52度を1本決め、振り幅を「小・中・大」の3つだけ持つ。",
+              "<b>ピンではなくグリーン中央を狙う。</b>寄せワンは狙わない。乗れば最悪でも2パットで収まる。",
+              "<b>上げようとせず、転がせる場面は必ず転がす。</b>ミスの許容範囲が段違いに広がる。"] },
+    putt: { head: "38P — 18ホールを、38パット以内に収める",
+      why: "38パットを超えているときの中身は、ほぼ3パットです。入れる練習より、距離を合わせる練習が効きます。",
+      items: ["<b>ロングパットは「入れる」ではなく「1メートル以内に寄せる」。</b>3パットの大半は1打目の距離感が原因。",
+              "<b>練習グリーンでは10メートルの距離感を最優先に。</b>1メートルの練習はその後、短く。",
+              "<b>ラインを読む時間を、タッチを合わせる時間に振り替える。</b>この段階では曲がりより強さの失点が大きい。"] }
+  };
+
+  var PARS = [4,5,3,4,4,3,5,4,4, 4,3,4,5,4,4,3,5,4];
+  var DEFAULTS = { drive: 7, iron: 8, atry: 15, aon: 9, putt: 36 };
+  var KEYS = ["drive", "iron", "atry", "aon", "putt"];
+  var N = 4000, N_DRAG = 1000;
+
+  var G_DRIVE = 0.70, G_IRON = 0.80, G_APP = 0.90, G_PUTT = 38;
+  var TEE_COST = 1.3;   // average strokes lost when a tee shot misses (0.3 chance of 2, else 1)
+
+  var el = {};
+  KEYS.forEach(function (k) { el[k] = document.getElementById("i-" + k); el["r_" + k] = document.getElementById("r-" + k); });
+
+  // ---- seeded PRNG so the same input always gives the same round ----
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function puttsOn(rand, m) {
+    if (m <= 2) return rand() < (2 - m) ? 1 : 2;
+    return rand() < (3 - m) ? 2 : 3;
+  }
+
+  // One hole, played shot by shot with the golfer's own success rates.
+  function simHole(rand, par, d, i, a, pm) {
+    var s, on, t;
+    if (par === 3) {
+      s = 1;
+      if (rand() >= (i + a) / 2) {          // missed the green off the tee
+        on = false; t = 0;
+        while (!on && t < 3) { s++; t++; on = rand() < a; }
+      }
+    } else {
+      s = 1;                                 // tee shot
+      if (rand() >= d) s += (rand() < 0.3 ? 2 : 1);
+      if (par === 5) s++;                    // lay-up
+      s++;                                   // the shot that should reach inside 50y
+      if (rand() >= i) s++;
+      on = false; t = 0;
+      while (!on && t < 3) { s++; t++; on = rand() < a; }
+    }
+    return s + puttsOn(rand, pm);
+  }
+
+  function simRound(rand, d, i, a, pm) {
+    var holes = [], total = 0, h;
+    for (var n = 0; n < 18; n++) { h = simHole(rand, PARS[n], d, i, a, pm); holes.push(h); total += h; }
+    return { holes: holes, total: total };
+  }
+
+  // Exact expectation of the simulation above — same rules, solved rather than sampled.
+  // Keeping these two in step is what lets the headline score, the loss map and the
+  // histogram all describe one single model.
+  function eApp(a) { return 1 + (1 - a) + (1 - a) * (1 - a); }   // chip until on, 3 tries max
+  function expected(d, i, a, putt) {
+    var pm = Math.min(2.95, Math.max(1.05, putt / 18));
+    var tee = 1 + (1 - d) * TEE_COST;
+    var carry = 1 + (1 - i);
+    var app = eApp(a);
+    var par4 = tee + carry + app + pm;
+    var par5 = par4 + 1;
+    var par3 = 1 + (1 - (i + a) / 2) * app + pm;
+    return 10 * par4 + 4 * par5 + 4 * par3;
+  }
+  // Cascade attribution, tee to cup: each term is what that pillar still costs once
+  // the ones before it have been lifted to standard. The four sum exactly to the total.
+  function losses(d, i, a, putt) {
+    var e0 = expected(d, i, a, putt);
+    var e1 = expected(G_DRIVE, i, a, putt);
+    var e2 = expected(G_DRIVE, G_IRON, a, putt);
+    var e3 = expected(G_DRIVE, G_IRON, G_APP, putt);
+    var e4 = expected(G_DRIVE, G_IRON, G_APP, G_PUTT);
+    return { drive: e0 - e1, iron: e1 - e2, app: e2 - e3, putt: e3 - e4 };
+  }
+
+  function statusOf(l) { return l <= 0.15 ? "good" : l <= 1.5 ? "warn" : "crit"; }
+  function cvar(s) { return "var(--" + s + ")"; }
+  function signed(n) { return (n > 0.05 ? "+" : n < -0.05 ? "−" : "±") + Math.abs(n).toFixed(1); }
+  function clampPct(p) { return Math.min(99, Math.max(1, Math.round(p))); }
+
+  // ---- callouts on the hole map ----
+  var callouts = {};
+  (function () {
+    var host = document.getElementById("callouts");
+    STAGES.forEach(function (st, idx) {
+      var g = document.createElementNS(SVGNS, "g");
+      g.setAttribute("class", "stage callout"); g.setAttribute("data-i", idx);
+      var lead = document.createElementNS(SVGNS, "line");
+      lead.setAttribute("x1", st.cx); lead.setAttribute("y1", 58);
+      lead.setAttribute("x2", st.cx); lead.setAttribute("y2", st.cy);
+      lead.setAttribute("stroke", "var(--ink)"); lead.setAttribute("stroke-width", "1"); lead.setAttribute("opacity", ".45");
+      g.appendChild(lead);
+      if (st.k === "putt") {
+        var flag = document.createElementNS(SVGNS, "path");
+        flag.setAttribute("d", "M " + st.cx + " 62 L " + (st.cx + 30) + " 71 L " + st.cx + " 80 Z");
+        g.appendChild(flag);
+      }
+      var box = document.createElementNS(SVGNS, "rect");
+      box.setAttribute("class", "chip-box");
+      box.setAttribute("x", st.cx - 62); box.setAttribute("y", 10);
+      box.setAttribute("width", 124); box.setAttribute("height", 46); box.setAttribute("rx", 2);
+      box.setAttribute("fill", "var(--sheet)"); box.setAttribute("stroke", "var(--line)");
+      g.appendChild(box);
+      var t1 = document.createElementNS(SVGNS, "text");
+      t1.setAttribute("x", st.cx); t1.setAttribute("y", 28);
+      t1.setAttribute("font-size", "13"); t1.setAttribute("font-weight", "700");
+      t1.setAttribute("text-anchor", "middle");
+      t1.setAttribute("fill", "var(--accent)"); t1.textContent = st.sh;
+      g.appendChild(t1);
+      var t2 = document.createElementNS(SVGNS, "text");
+      t2.setAttribute("x", st.cx); t2.setAttribute("y", 48);
+      t2.setAttribute("font-size", "17"); t2.setAttribute("font-weight", "700");
+      t2.setAttribute("text-anchor", "middle");
+      g.appendChild(t2);
+      // the verdict stamp, planted on the route: O = meets the standard, X = does not
+      var mg = document.createElementNS(SVGNS, "g");
+      var disc = document.createElementNS(SVGNS, "circle");
+      disc.setAttribute("cx", st.cx); disc.setAttribute("cy", st.my); disc.setAttribute("r", 18);
+      disc.setAttribute("fill", "var(--sheet)"); disc.setAttribute("stroke-width", "2.5");
+      mg.appendChild(disc);
+      var ring = document.createElementNS(SVGNS, "circle");
+      ring.setAttribute("cx", st.cx); ring.setAttribute("cy", st.my); ring.setAttribute("r", 9);
+      ring.setAttribute("fill", "none"); ring.setAttribute("stroke-width", "3.6");
+      mg.appendChild(ring);
+      var cross = document.createElementNS(SVGNS, "g");
+      cross.setAttribute("stroke-width", "3.6"); cross.setAttribute("stroke-linecap", "round");
+      [[-7, -7, 7, 7], [7, -7, -7, 7]].forEach(function (p) {
+        var ln = document.createElementNS(SVGNS, "line");
+        ln.setAttribute("x1", st.cx + p[0]); ln.setAttribute("y1", st.my + p[1]);
+        ln.setAttribute("x2", st.cx + p[2]); ln.setAttribute("y2", st.my + p[3]);
+        cross.appendChild(ln);
+      });
+      mg.appendChild(cross);
+      g.appendChild(mg);
+
+      host.appendChild(g);
+      callouts[st.k] = { g: g, box: box, val: t2, flag: g.querySelector("path"),
+                         disc: disc, ring: ring, cross: cross };
+    });
+  })();
+
+  var shot = {
+    zone:  document.getElementById("putt-zone"),
+    drive: document.getElementById("shot-drive"),
+    iron:  document.getElementById("shot-iron"),
+    app:   document.getElementById("shot-app"),
+    ball:  document.getElementById("ball-app"),
+    putt:  document.getElementById("shot-putt")
+  };
+
+  // Shot shapes scale continuously with the numbers entered, with a deliberate
+  // step at the 789P38 standard so that clearing it is visible at a glance:
+  // below the standard the fan always spills past the rough (half-width 73) or
+  // stops short of the target; at or above it, the fan tightens and reaches.
+  function ramp(v, thr, lo0, lo1, hi0, hi1) {
+    if (v < thr) return lo0 + (lo1 - lo0) * Math.max(0, Math.min(1, v / thr));
+    return hi0 + (hi1 - hi0) * Math.max(0, Math.min(1, (v - thr) / (1 - thr)));
+  }
+  // Ranges are wide on purpose: each hole added to the count has to move the
+  // picture enough to see. Below the standard the fan both spreads past the
+  // rough and falls short; above it, it tightens and runs on.
+  var FAN = {
+    drive: { o: [72, 226],  ang: -6.9, thr: 0.70,
+             half: [34, 19, 15, 4], r: [170, 250, 258, 288] },
+    iron:  { o: [330, 195], ang: -6.2, thr: 0.80,
+             half: [30, 17, 13, 4], r: [130, 268, 290, 330] }
+  };
+  // approach: the ball lands further up the hole the better the on-green rate,
+  // crossing onto the putting surface exactly at the 9-in-10 standard
+  function flightOf(a) {
+    var ex = ramp(a, 0.90, 640, 790, 828, 874);
+    var ey = 164 - (ex - 616) * 0.1098;              // ground line from 50y to the cup
+    var peak = Math.min(164, ey) - (20 + (ex - 616) * 0.13);
+    var cx = (616 + ex) / 2, cy = 2 * peak - 0.5 * (164 + ey);
+    return { d: "M 616 164 Q " + cx.toFixed(1) + " " + cy.toFixed(1) + " " +
+                ex.toFixed(1) + " " + ey.toFixed(1), ball: [ex, ey] };
+  }
+  function fanPath(o, ang, half, R) {
+    var D = Math.PI / 180;
+    var a1 = (ang - half) * D, a2 = (ang + half) * D;
+    return "M " + o[0] + " " + o[1] +
+           " L " + (o[0] + R * Math.cos(a1)).toFixed(1) + " " + (o[1] + R * Math.sin(a1)).toFixed(1) +
+           " A " + R + " " + R + " 0 0 1 " +
+           (o[0] + R * Math.cos(a2)).toFixed(1) + " " + (o[1] + R * Math.sin(a2)).toFixed(1) + " Z";
+  }
+
+  var CAN_HOVER = window.matchMedia && window.matchMedia("(hover: hover)").matches;
+
+  function highlight(k) {
+    STAGES.forEach(function (st) {
+      callouts[st.k].g.classList.toggle("dim", k !== null && st.k !== k);
+      callouts[st.k].g.classList.toggle("lit", k !== null && st.k === k);
+    });
+    document.querySelectorAll(".field").forEach(function (f) { f.classList.toggle("lit", k !== null && f.dataset.k === k); });
+    document.querySelectorAll(".card2").forEach(function (c) { c.classList.toggle("lit", k !== null && c.dataset.k === k); });
+  }
+  if (CAN_HOVER) document.querySelectorAll(".seg-hit").forEach(function (p) {
+    p.addEventListener("mouseenter", function () { highlight(p.dataset.k); });
+    p.addEventListener("mouseleave", function () { highlight(null); });
+  });
+
+  // ---- input plumbing ----
+  // 4000 rounds costs ~35ms, which drops frames while a slider is being dragged.
+  // So: a light pass on every input to keep the page responsive, then the full
+  // simulation once the slider has settled.
+  var settle = null;
+  function schedule() {
+    render(N_DRAG);
+    clearTimeout(settle);
+    settle = setTimeout(function () { render(N); }, 140);
+  }
+  document.querySelectorAll(".field").forEach(function (f) {
+    (CAN_HOVER ? ["mouseenter", "focusin"] : ["focusin"]).forEach(function (e) {
+      f.addEventListener(e, function () { highlight(f.dataset.k); }); });
+    (CAN_HOVER ? ["mouseleave", "focusout"] : ["focusout"]).forEach(function (e) {
+      f.addEventListener(e, function () { highlight(null); }); });
+    f.querySelector("input").addEventListener("input", schedule);
+  });
+
+  var rollSeed = 1;
+  document.getElementById("reroll").addEventListener("click", function () { rollSeed++; render(); });
+  document.getElementById("reset").addEventListener("click", function () {
+    el.aon.max = DEFAULTS.atry;
+    Object.keys(DEFAULTS).forEach(function (k) { el[k].value = DEFAULTS[k]; });
+    rollSeed = 1;
+    render();
+    // confirm the press even when the values were already at their defaults
+    var bar = document.querySelector(".inputbar");
+    bar.classList.remove("flash");
+    void bar.offsetWidth;
+    bar.classList.add("flash");
+  });
+
+  // paint the passing stretch of a slider: pct is where the standard sits,
+  // dir is which side of it counts as a pass
+  function setZone(key, pct, dir, label, done) {
+    var inp = document.getElementById("i-" + (key === "app" ? "aon" : key));
+    if (!inp) return;
+    var p = Math.max(0, Math.min(100, pct)) / 100;
+    var PASS = "var(--zone-pass)", FAIL = "var(--track)", LINE = "var(--good)";
+    // A range thumb's centre travels from 9.5px to (width - 9.5px), not 0 to 100%,
+    // so the boundary is placed in the thumb's own coordinates. Otherwise the line
+    // sits a few pixels away from where the thumb actually stops.
+    var at = function (off) { return "calc((100% - 19px) * " + p.toFixed(5) + " + " + off + "px)"; };
+    var a = at(8.7), b = at(10.3);
+    inp.style.setProperty("--zonebg", dir === "up"
+      ? "linear-gradient(to right," + FAIL + " 0 " + a + "," + LINE + " " + a + " " + b + "," +
+        PASS + " " + b + " 100%)"
+      : "linear-gradient(to right," + PASS + " 0 " + a + "," + LINE + " " + a + " " + b + "," +
+        FAIL + " " + b + " 100%)");
+    var lab = document.getElementById("zl-" + key);
+    if (lab) {
+      lab.innerHTML = "";
+      var b = document.createElement("b");
+      b.textContent = done + "%";
+      lab.appendChild(b);
+      lab.appendChild(document.createTextNode(" 達成 ／ " + label));
+    }
+  }
+
+  function read() {
+    var atry = +el.atry.value;
+    el.aon.max = atry;
+    if (+el.aon.value > atry) el.aon.value = atry;
+    var v = { drive: +el.drive.value, iron: +el.iron.value, atry: atry, aon: +el.aon.value, putt: +el.putt.value };
+    el.r_drive.innerHTML = v.drive + "<small>/14</small>";
+    el.r_iron.innerHTML = v.iron + "<small>/14</small>";
+    el.r_atry.innerHTML = v.atry + "<small>回</small>";
+    el.r_aon.innerHTML = v.aon + "<small>回</small>";
+    el.r_putt.innerHTML = v.putt + "<small>パット</small>";
+
+    var pc = function (x) { return Math.max(0, Math.round(x * 100)); };
+    var need = Math.ceil(G_APP * atry);
+    setZone("drive", 10 / 14 * 100, "up", "合格ライン 10ホール以上",
+            pc(v.drive / 14 / G_DRIVE));
+    setZone("iron", 12 / 14 * 100, "up", "合格ライン 12ホール以上",
+            pc(v.iron / 14 / G_IRON));
+    setZone("app", atry > 0 ? need / atry * 100 : 100, "up", "合格ライン " + need + "回以上",
+            pc(atry > 0 ? v.aon / atry / G_APP : 0));
+    setZone("putt", (G_PUTT - 24) / (48 - 24) * 100, "down", "合格ライン 38パット以下",
+            pc(G_PUTT / v.putt));
+    return v;
+  }
+
+  // ---- histogram ----
+  // ---- the spread of scores as one bar, cut green / grey at 100
+  function drawRange(sorted, M, mean) {
+    var g = document.getElementById("rangebar");
+    while (g.firstChild) g.removeChild(g.firstChild);
+    var best = sorted[0], worst = sorted[M - 1], mid = Math.round(mean);
+    var lo = Math.min(best, 100) - 3, hi = Math.max(worst, 100) + 3;
+    var L = 46, R = 674, W = R - L, Y = 36, H = 30;
+    function X(v) { return L + (v - lo) / (hi - lo) * W; }
+    function mk(t, o) { var e = document.createElementNS(SVGNS, t);
+      Object.keys(o).forEach(function (k) { e.setAttribute(k, o[k]); }); g.appendChild(e); return e; }
+
+    // the bar is clipped to a rounded capsule, then filled in two flat colours
+    var defs = mk("defs", {});
+    var cp = document.createElementNS(SVGNS, "clipPath"); cp.setAttribute("id", "rngclip");
+    var cr = document.createElementNS(SVGNS, "rect");
+    cr.setAttribute("x", X(best)); cr.setAttribute("y", Y);
+    cr.setAttribute("width", Math.max(3, X(worst) - X(best))); cr.setAttribute("height", H);
+    cr.setAttribute("rx", 7); cp.appendChild(cr); defs.appendChild(cp);
+
+    var grp = mk("g", { "clip-path": "url(#rngclip)" });
+    [["var(--good)", L - 10, X(100)], ["var(--off)", X(100), R + 10]].forEach(function (p) {
+      var w = p[2] - p[1]; if (w <= 0) return;
+      var r = document.createElementNS(SVGNS, "rect");
+      r.setAttribute("x", p[1]); r.setAttribute("y", Y);
+      r.setAttribute("width", w); r.setAttribute("height", H); r.setAttribute("fill", p[0]);
+      grp.appendChild(r);
+    });
+
+    // 100-breaking line, labelled above the bar
+    if (100 >= lo && 100 <= hi) {
+      mk("line", { x1: X(100), y1: Y - 15, x2: X(100), y2: Y + H + 8,
+                   stroke: "var(--ink)", "stroke-width": 1.5, "stroke-dasharray": "4 3" });
+      mk("text", { x: X(100) - 7, y: Y - 19, "font-size": 12, "font-weight": 700,
+                   "text-anchor": "end", fill: "var(--ink)" }).textContent = "100切りライン";
+    }
+    // where most rounds land
+    mk("line", { x1: X(mid), y1: Y, x2: X(mid), y2: Y + H, stroke: "var(--sheet)", "stroke-width": 3 });
+    mk("text", { x: X(mid), y: Y + H + 26, "font-size": 13, "font-weight": 700,
+                 "text-anchor": "middle", fill: "var(--ink)" }).textContent = "平均 " + mid;
+    mk("text", { x: X(best), y: Y - 8, "font-size": 12, "text-anchor": "middle",
+                 fill: "var(--muted)" }).textContent = best;
+    mk("text", { x: X(worst), y: Y - 8, "font-size": 12, "text-anchor": "middle",
+                 fill: "var(--muted)" }).textContent = worst;
+  }
+
+  // ---- scorecard ----
+  function clsOf(score, par) {
+    var v = score - par;
+    return v <= -1 ? "b" : v === 0 ? "p" : v === 1 ? "bo" : v === 2 ? "d" : "t";
+  }
+  function halfTable(label, from, holes) {
+    var h = '<table class="card"><thead><tr><th class="rh">HOLE</th>';
+    for (var n = from; n < from + 9; n++) h += "<th>" + (n + 1) + "</th>";
+    h += '<th class="tot">' + label + "</th></tr></thead><tbody>";
+    var pt = 0, st = 0;
+    h += '<tr><th class="rh">PAR</th>';
+    for (n = from; n < from + 9; n++) { pt += PARS[n]; h += "<td>" + PARS[n] + "</td>"; }
+    h += '<td class="tot">' + pt + "</td></tr>";
+    h += '<tr class="sr"><th class="rh">SCORE</th>';
+    for (n = from; n < from + 9; n++) {
+      st += holes[n];
+      var c = clsOf(holes[n], PARS[n]);
+      h += '<td class="' + c + '">' + (c === "bo" ? holes[n] : "<span>" + holes[n] + "</span>") + "</td>";
+    }
+    h += '<td class="tot">' + st + "</td></tr></tbody></table>";
+    return h;
+  }
+
+  // ---- render ----
+  function render(rounds) {
+    var M = rounds || N;
+    var v = read();
+    var d = v.drive / 14, i = v.iron / 14, a = v.atry > 0 ? v.aon / v.atry : 0;
+    var pm = Math.min(2.95, Math.max(1.05, v.putt / 18));
+
+    // simulate
+    var seed = (v.drive * 7919 + v.iron * 6151 + v.atry * 3571 + v.aon * 1543 + v.putt * 389 + 12345) | 0;
+    var rand = mulberry32(seed);
+    var samples = new Array(M);
+    for (var n = 0; n < M; n++) samples[n] = simRound(rand, d, i, a, pm).total;
+    var sorted = samples.slice().sort(function (x, y) { return x - y; });
+    var mean = expected(d, i, a, v.putt);   // exact, so the figure never jitters as you drag
+    var under = 0;
+    for (n = 0; n < M; n++) if (samples[n] <= 99) under++;
+    var prob = clampPct(under / M * 100);
+
+    var L = losses(d, i, a, v.putt);
+    var totalLoss = L.drive + L.iron + L.app + L.putt;
+
+    // hole map
+    STAGES.forEach(function (st) {
+      var loss = L[st.k], stat = statusOf(loss);
+      if (st.k === "drive" || st.k === "iron") {
+        var cfg = FAN[st.k], rate = st.k === "drive" ? d : i;
+        var half = ramp(rate, cfg.thr, cfg.half[0], cfg.half[1], cfg.half[2], cfg.half[3]);
+        var rad  = ramp(rate, cfg.thr, cfg.r[0],    cfg.r[1],    cfg.r[2],    cfg.r[3]);
+        shot[st.k].setAttribute("d", fanPath(cfg.o, cfg.ang, half, rad));
+        shot[st.k].setAttribute("fill", cvar(stat));
+        shot[st.k].setAttribute("stroke", cvar(stat));
+      } else if (st.k === "app") {
+        var fl = flightOf(a);
+        shot.app.setAttribute("d", fl.d);
+        shot.app.setAttribute("stroke", cvar(stat));
+        shot.ball.setAttribute("cx", fl.ball[0].toFixed(1));
+        shot.ball.setAttribute("cy", fl.ball[1].toFixed(1));
+        shot.ball.setAttribute("fill", cvar(stat));
+      } else {
+        shot.putt.setAttribute("stroke", cvar(stat));
+        // the disc fills the whole green at 38 putts and shrinks from there
+        var k = Math.max(0.25, Math.min(1, 1 - (v.putt - G_PUTT) * 0.075));
+        shot.zone.setAttribute("rx", (68 * k - 1.5).toFixed(1));
+        shot.zone.setAttribute("ry", (48 * k - 1.5).toFixed(1));
+        shot.zone.setAttribute("fill", cvar(stat));
+      }
+      // mirror the verdict onto the slider that produced it
+      var fm = document.getElementById("m-" + st.k);
+      if (fm) { fm.className = "fmark " + stat; fm.textContent = stat === "good" ? "○" : "×"; }
+      document.querySelectorAll('[data-k="' + st.k + '"]').forEach(function (n) {
+        if (!n.classList.contains("field") && !n.classList.contains("fieldpair")) return;
+        n.classList.remove("st-good", "st-warn", "st-crit");
+        n.classList.add("st-" + stat);
+      });
+
+      var c = callouts[st.k];
+      c.val.textContent = signed(loss) + "打";
+      c.val.setAttribute("fill", loss > 0.15 ? cvar(stat) : "var(--ink)");
+      c.box.setAttribute("stroke", loss > 1.5 ? cvar(stat) : "var(--line)");
+      if (c.flag) c.flag.setAttribute("fill", cvar(stat));
+      var pass = stat === "good";                       // clears the 789P38 standard
+      c.disc.setAttribute("stroke", cvar(stat));
+      c.ring.setAttribute("stroke", cvar(stat));
+      c.cross.setAttribute("stroke", cvar(stat));
+      c.ring.setAttribute("display", pass ? "inline" : "none");
+      c.cross.setAttribute("display", pass ? "none" : "inline");
+    });
+
+    // verdict
+    var pstat = prob >= 50 ? "good" : prob >= 20 ? "warn" : "crit";
+    var band = document.getElementById("band");
+    band.className = "band " + pstat;
+    band.textContent = prob >= 50 ? "射程内 — あとは再現性" : prob >= 20 ? "あと一歩 — 柱が1本足りない" : "まだ土台づくりの段階";
+    document.getElementById("prob").textContent = prob;
+    var pb = document.getElementById("probbar");
+    pb.style.width = prob + "%"; pb.style.background = cvar(pstat);
+
+    // the one number the whole page exists to produce
+    var gap = Math.max(0, Math.round(mean) - 99);
+    var hero = document.getElementById("hero");
+    hero.classList.toggle("ok", gap === 0);
+    document.getElementById("gap-n").textContent = gap;
+    document.getElementById("hero-sub").textContent = gap === 0
+      ? "いまの技術なら、平均で100を切れています。"
+      : "いまの平均は " + Math.round(mean) + " 打。あと " + gap + " 打ちぢめれば100切りです。";
+    document.getElementById("probnote").textContent =
+      "100ラウンドまわると、そのうち " + prob + " 回は100を切れる計算です。";
+
+    document.getElementById("score").innerHTML = Math.round(mean) + "<small>打</small>";
+    document.getElementById("scorenote").textContent =
+      "ベスト " + sorted[0] + "、ワースト " + sorted[M - 1] + "。半分は " +
+      sorted[Math.floor(M * 0.25)] + "〜" + sorted[Math.floor(M * 0.75)] + " に収まります。";
+
+    var ex = document.getElementById("excess");
+    ex.innerHTML = signed(totalLoss) + "<small>打</small>";
+    ex.style.color = totalLoss <= 0.15 ? cvar("good") : totalLoss <= 3 ? cvar("warn") : cvar("crit");
+    document.getElementById("excessnote").textContent = totalLoss <= 0.15
+      ? "4区間すべてが基準に達しています。あとはこれを毎回出せるかどうか。"
+      : "基準どおりに回る人より " + totalLoss.toFixed(1) + " 打多くかかっている計算です。";
+
+    // distribution
+    drawRange(sorted, M, mean);
+    document.getElementById("s-best").textContent = sorted[0] + " 打";
+    document.getElementById("s-typ").textContent = Math.round(mean) + " 打";
+    document.getElementById("s-worst").textContent = sorted[M - 1] + " 打";
+    document.getElementById("rangenote").textContent =
+      "半分のラウンドは " + sorted[Math.floor(M * 0.25)] + "〜" + sorted[Math.floor(M * 0.75)] + " 打に収まります。";
+
+    // scorecard — one round drawn from the same technique
+    var cardRound = simRound(mulberry32((seed ^ (rollSeed * 2654435761)) | 0), d, i, a, pm);
+    document.getElementById("sc-body").innerHTML =
+      halfTable("OUT", 0, cardRound.holes) + halfTable("IN", 9, cardRound.holes);
+    var diff = cardRound.total - 72;
+    document.getElementById("sc-total").textContent = cardRound.total + " 打（+" + diff + "）";
+    document.getElementById("sc-vs").textContent =
+      cardRound.total <= 99 ? "100切り達成" : "100切りまで あと " + (cardRound.total - 99) + " 打";
+
+    // stage cards
+    var fig = {
+      drive: { cur: v.drive + "/14", ratio: d / G_DRIVE, gap: (10 - v.drive) + " ホール" },
+      iron:  { cur: v.iron + "/14",  ratio: i / G_IRON,  gap: (12 - v.iron) + " ホール" },
+      app:   { cur: Math.round(a * 100) + "%", ratio: a / G_APP,
+               gap: Math.max(1, Math.ceil(G_APP * v.atry - v.aon)) + " 回" },
+      putt:  { cur: v.putt + "パット", ratio: G_PUTT / v.putt, gap: (v.putt - G_PUTT) + " パット" }
+    };
+    var html = "";
+    STAGES.forEach(function (st) {
+      var f = fig[st.k], loss = L[st.k], stat = statusOf(loss);
+      html += '<div class="card2" data-k="' + st.k + '">' +
+        '<div class="chead"><span class="tag">' + st.tag + '</span><span class="cname">' + st.name + '</span>' +
+        '<span class="closs" style="color:' + (loss > 0.15 ? cvar(stat) : "var(--ink)") + '">' + signed(loss) + '打</span></div>' +
+        '<div class="cfig"><b>' + f.cur + '</b> &nbsp;/&nbsp; 基準 ' + st.goal + '</div>' +
+        '<div class="ctrack"><i style="width:' + (Math.min(f.ratio, 1.28) * 78).toFixed(1) + '%;background:' + cvar(stat) + '"></i><u></u></div>' +
+        '<div class="cfoot" style="color:' + (stat === "good" ? cvar("good") : "var(--muted)") + '">' +
+        (stat === "good" ? "基準クリア" : "基準まで あと " + f.gap) + '</div></div>';
+    });
+    var stagesEl = document.getElementById("stages");
+    stagesEl.innerHTML = html;
+    if (CAN_HOVER) stagesEl.querySelectorAll(".card2").forEach(function (c) {
+      c.addEventListener("mouseenter", function () { highlight(c.dataset.k); });
+      c.addEventListener("mouseleave", function () { highlight(null); });
+    });
+
+    // what-if: exact expectation deltas, probability read off the shifted distribution
+    var now = mean;
+    var alt = {
+      drive: expected(Math.max(d, G_DRIVE), i, a, v.putt),
+      iron:  expected(d, Math.max(i, G_IRON), a, v.putt),
+      app:   expected(d, i, Math.max(a, G_APP), v.putt),
+      putt:  expected(d, i, a, Math.min(v.putt, G_PUTT))
+    };
+    function probShift(delta) {
+      var c = 0;
+      for (var q = 0; q < M; q++) if (samples[q] - delta <= 99) c++;
+      return clampPct(c / M * 100);
+    }
+    var gains = STAGES.map(function (st) {
+      var g = Math.max(0, now - alt[st.k]);
+      return { k: st.k, name: st.tag + " — " + st.name + "を基準まで", gain: g, np: probShift(g) };
+    }).sort(function (x, y) { return y.gain - x.gain; });
+    var maxg = Math.max.apply(null, gains.map(function (g) { return g.gain; }));
+    var gh = "";
+    gains.forEach(function (g) {
+      gh += '<div class="grow" data-k="' + g.k + '"><div class="ghead"><span class="gname">' + g.name + '</span>' +
+        '<span class="gval">' + (g.gain >= 0.05 ? "−" + g.gain.toFixed(1) : "±0") + ' 打</span></div>' +
+        '<div class="gtrack"><i style="width:' + (maxg > 0 ? g.gain / maxg * 100 : 0).toFixed(1) + '%"></i></div>' +
+        '<div class="gnote">' + (g.gain >= 0.05
+          ? "平均 " + Math.round(mean) + " → " + Math.round(mean - g.gain) + " 打 ／ 100切り " + prob + "% → " + g.np + "%"
+          : "すでに基準を満たしています") + '</div></div>';
+    });
+    var gainsEl = document.getElementById("gains");
+    gainsEl.innerHTML = gh;
+    if (CAN_HOVER) gainsEl.querySelectorAll(".grow").forEach(function (r) {
+      r.addEventListener("mouseenter", function () { highlight(r.dataset.k); });
+      r.addEventListener("mouseleave", function () { highlight(null); });
+    });
+
+    // prescription
+    var top = gains[0], rx = document.getElementById("rx");
+    document.getElementById("act-main").textContent = top.gain < 0.05
+      ? "4つとも基準クリア。あとは大叩きを減らすだけ。"
+      : RX[top.k].head;
+    document.getElementById("act-sub").textContent = top.gain < 0.05
+      ? "崩れたホールをダブルボギーで止められるかが、次のテーマです。"
+      : "ここだけ基準まで上げると、平均 " + Math.round(mean) + " → " + Math.round(mean - top.gain) +
+        " 打（" + top.gain.toFixed(1) + "打ちぢむ）。100切りの可能性は " + prob + "% → " + top.np + "%。";
+    if (top.gain < 0.05) {
+      rx.innerHTML = '<div class="rxhd"><span class="k">NEXT</span><h4>4区間すべてが基準に届いています</h4></div>' +
+        '<div class="rxbd"><p class="rxwhy">789P38理論の観点では、伸ばすべき技術は残っていません。ここから先は平均スコアではなく、ブレ幅を縮める段階です。</p>' +
+        '<ol><li><b>大叩きホールを1つ減らす。</b>崩れたホールをダブルボギーで止められるかが次のテーマ。</li>' +
+        '<li><b>スタート3ホールの入り方を固定する。</b>前半の出遅れが平均を押し上げている。</li></ol></div>';
+    } else {
+      var r2 = RX[top.k];
+      rx.innerHTML = '<div class="rxhd"><span class="k">NEXT — 次に直すべき1本</span><h4>' + r2.head + '</h4></div>' +
+        '<div class="rxbd"><p class="rxwhy">' + r2.why + '</p><ol>' +
+        r2.items.map(function (t) { return "<li>" + t + "</li>"; }).join("") + '</ol></div>';
+    }
+  }
+
+  render();
+  setTimeout(function () { document.querySelector("svg.hole").classList.remove("anim"); }, 1800);
+})();
+</script>
+</body>
+</html>
